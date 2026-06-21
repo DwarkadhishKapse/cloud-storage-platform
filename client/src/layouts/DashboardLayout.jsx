@@ -5,11 +5,17 @@ import Sidebar from "../components/Sidebar";
 
 const DashboardLayout = () => {
   return (
-    <>
+    <div className="flex min-h-screen bg-white">
       <Sidebar />
-      <Navbar />
-      <Outlet />
-    </>
+
+      <div className="flex flex-1 flex-col">
+        <Navbar />
+
+        <main className="flex-1 p-6">
+          <Outlet />
+        </main>
+      </div>
+    </div>
   );
 };
 
