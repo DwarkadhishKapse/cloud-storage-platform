@@ -1,4 +1,5 @@
-import React from 'react'
+import React from "react";
+import { FiGrid, FiList } from "react-icons/fi";
 
 const Navbar = () => {
   return (
@@ -6,14 +7,24 @@ const Navbar = () => {
       <input
         type="text"
         placeholder="Search files and folders..."
-        className="w-96 rounded-lg border border-gray-300 px-4 py-2 outline-none"
+        className="w-96 rounded-xl border border-gray-300 px-4 py-2 outline-none"
       />
+
+      <div className="flex items-center gap-3">
+        <button>
+          <FiGrid size={20} />
+        </button>
+
+        <button>
+          <FiList size={20} />
+        </button>
+      </div>
 
       <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-600 text-white">
         D
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default Navbar
+export default Navbar;
