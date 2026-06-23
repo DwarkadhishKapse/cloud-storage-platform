@@ -2,6 +2,7 @@ import React from "react";
 import FolderCard from "../components/FolderCard";
 import Breadcrumb from "../components/Breadcrumb";
 import FileCard from "../components/FileCard";
+import useViewStore from "../store/useViewStore";
 
 const folders = [
   {
@@ -42,6 +43,7 @@ const files = [
 const breadcrumbItems = ["Home"];
 
 const DashboardPage = () => {
+  const { view } = useViewStore();
   return (
     <div>
       <h1 className="mb-8 text-4xl font-bold text-slate-900">Dashboard</h1>
@@ -56,9 +58,20 @@ const DashboardPage = () => {
       <div className="mt-10">
         <h2 className="mb-5 text-2xl font-bold text-slate-900">Files</h2>
 
-        <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
+        <div
+          className={
+            view == "grid"
+              ? "grid grid-col-1 gap-5 md:grid-cols-2 xl:grid-cols-3"
+              : "space-y-4"
+          }
+        >
           {files.map((file) => (
-            <FileCard key={file.id} name={file.name} size={file.size} type={file.type}/>
+            <FileCard
+              key={file.id}
+              name={file.name}
+              size={file.size}
+              type={file.type}
+            />
           ))}
         </div>
       </div>

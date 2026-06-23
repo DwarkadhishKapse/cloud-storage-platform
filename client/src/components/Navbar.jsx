@@ -1,7 +1,10 @@
 import React from "react";
 import { FiGrid, FiList } from "react-icons/fi";
+import useViewStore from "../store/useViewStore";
 
 const Navbar = () => {
+  const { view, setView } = useViewStore();
+
   return (
     <div className="flex items-center justify-between border-b border-slate-200 bg-white p-4">
       <input
@@ -11,11 +14,25 @@ const Navbar = () => {
       />
 
       <div className="flex items-center gap-2">
-        <button className="rounded-2xl p-2 text-slate-700 transition-all duration-200 hover:bg-slate-100">
+        <button
+          onClick={() => setView("grid")}
+          className={`rounded-2xl p-2 transition-all duration-200 ${
+            view === "grid"
+              ? "bg-emerald-100 text-emerald-700"
+              : "text-slate-700 hover:bg-slate-100"
+          }`}
+        >
           <FiGrid size={20} />
         </button>
 
-        <button className="rounded-2xl p-2 text-slate-700 transition-all duration-200 hover:bg-slate-100">
+        <button
+          onClick={() => setView("list")}
+          className={`rounded-2xl p-2 transition-all duration-200 ${
+            view === "list"
+              ? "bg-emerald-100 text-emerald-700"
+              : "text-slate-700 hover:bg-slate-100"
+          }`}
+        >
           <FiList size={20} />
         </button>
       </div>
