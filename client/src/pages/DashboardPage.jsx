@@ -60,8 +60,8 @@ const DashboardPage = () => {
 
         <div
           className={
-            view == "grid"
-              ? "grid grid-col-1 gap-5 md:grid-cols-2 xl:grid-cols-3"
+            view === "grid"
+              ? "grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3"
               : "space-y-4"
           }
         >
