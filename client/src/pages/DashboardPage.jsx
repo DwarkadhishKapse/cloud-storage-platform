@@ -3,6 +3,7 @@ import FolderCard from "../components/FolderCard";
 import Breadcrumb from "../components/Breadcrumb";
 import FileCard from "../components/FileCard";
 import useViewStore from "../store/useViewStore";
+import { useNavigate } from "react-router-dom";
 
 const folders = [
   {
@@ -43,6 +44,8 @@ const files = [
 const breadcrumbItems = ["Home"];
 
 const DashboardPage = () => {
+  const navigate = useNavigate();
+
   const { view } = useViewStore();
   return (
     <div>
@@ -51,7 +54,11 @@ const DashboardPage = () => {
       <Breadcrumb items={breadcrumbItems} />
       <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
         {folders.map((folder) => (
-          <FolderCard key={folder.id} name={folder.name} />
+          <FolderCard
+            key={folder.id}
+            name={folder.name}
+            onClick={() => navigate(`/folder/${folder.id}`)}
+          />
         ))}
       </div>
 

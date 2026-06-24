@@ -1,8 +1,11 @@
 import { FiFolder } from "react-icons/fi";
 
-const FolderCard = ({ name }) => {
+const FolderCard = ({ name, onClick }) => {
   return (
-    <div className="flex cursor-pointer items-center gap-4 rounded-2xl border border-slate-200 bg-white p-5 transition-all duration-200 hover:border-emerald-300 hover:shadow-md">
+    <div
+      onClick={onClick}
+      className="flex cursor-pointer items-center gap-4 rounded-2xl border border-slate-200 bg-white p-5 transition-all duration-200 hover:border-emerald-300 hover:shadow-md"
+    >
       <FiFolder size={28} className="text-emerald-600" />
 
       <div>
