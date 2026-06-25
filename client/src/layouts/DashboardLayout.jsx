@@ -1,12 +1,14 @@
-import React from "react";
+import React, { useState } from "react";
 import { Outlet } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import Sidebar from "../components/Sidebar";
+import CreateFolderModal from "../components/CreateFolderModal";
 
 const DashboardLayout = () => {
+  const [isCreateFolderOpen, setIsCreateFolderOpen] = useState(false);
   return (
     <div className="flex min-h-screen bg-white">
-      <Sidebar />
+      <Sidebar onNewFolder={() => setIsCreateFolderOpen(true)} />
 
       <div className="flex flex-1 flex-col">
         <Navbar />
@@ -15,6 +17,10 @@ const DashboardLayout = () => {
           <Outlet />
         </main>
       </div>
+      <CreateFolderModal
+        isOpen={isCreateFolderOpen}
+        onClose={() => setIsCreateFolderOpen(false)}
+      />
     </div>
   );
 };

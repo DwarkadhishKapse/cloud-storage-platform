@@ -28,15 +28,16 @@ const navItems = [
   },
 ];
 
-const Sidebar = () => {
+const Sidebar = ({ onNewFolder }) => {
   return (
     <div className="flex w-64 flex-col border-r border-slate-200 bg-white p-6">
       <div>
-        <h1 className="mb-8 text-4xl font-bold text-emerald-600">
-          ClouD
-        </h1>
+        <h1 className="mb-8 text-4xl font-bold text-emerald-600">ClouD</h1>
 
-        <button className="mb-8 w-full rounded-2xl bg-emerald-600 px-5 py-3 text-white transition-all duration-200 hover:bg-emerald-700">
+        <button
+          onClick={onNewFolder}
+          className="mb-8 w-full rounded-2xl bg-emerald-600 px-5 py-3 text-white transition-all duration-200 hover:bg-emerald-700"
+        >
           + New
         </button>
 
@@ -65,13 +66,9 @@ const Sidebar = () => {
       </div>
 
       <div className="mt-auto border-t border-slate-200 pt-6">
-        <h3 className="mb-2 font-semibold text-slate-800">
-          Storage
-        </h3>
+        <h3 className="mb-2 font-semibold text-slate-800">Storage</h3>
 
-        <p className="mb-3 text-sm text-slate-500">
-          2.1 GB / 15 GB
-        </p>
+        <p className="mb-3 text-sm text-slate-500">2.1 GB / 15 GB</p>
 
         <div className="h-2 w-full rounded-full bg-slate-200">
           <div className="h-2 w-1/3 rounded-full bg-emerald-600"></div>
