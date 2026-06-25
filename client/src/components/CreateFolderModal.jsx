@@ -1,7 +1,10 @@
-import React from "react";
+import React, { useState } from "react";
 
 const CreateFolderModal = ({ isOpen, onClose }) => {
+  const [folderName, setFolderName] = useState("");
+  
   if (!isOpen) return null;
+
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black/30">
       <div className="w-full max-w-md rounded-3xl bg-white p-6 shadow-xl">
@@ -12,6 +15,8 @@ const CreateFolderModal = ({ isOpen, onClose }) => {
         <input
           type="text"
           placeholder="Enter folder name"
+          value={folderName}
+          onChange={(e) => setFolderName(e.target.value)}
           className="w-full rounded-2xl border border-slate-200 px-4 py-3 outline-none focus:border-emerald-500"
         />
 
@@ -23,7 +28,20 @@ const CreateFolderModal = ({ isOpen, onClose }) => {
             Cancel
           </button>
 
-          <button className="rounded-2xl bg-emerald-600 px-5 py-2 text-white hover:bg-emerald-700">
+          <button
+            onClick={() => {
+              if (!folderName.trim()) {
+                alert("Folder name is required");
+                return;
+              }
+
+              console.log(folderName);
+
+              setFolderName("");
+              onClose();
+            }}
+            className="rounded-2xl bg-emerald-600 px-5 py-2 text-white hover:bg-emerald-700"
+          >
             Create new Folder
           </button>
         </div>

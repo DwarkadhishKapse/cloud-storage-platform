@@ -1,24 +1,9 @@
-import React from "react";
+import React, { useState } from "react";
 import FolderCard from "../components/FolderCard";
 import Breadcrumb from "../components/Breadcrumb";
 import FileCard from "../components/FileCard";
 import useViewStore from "../store/useViewStore";
 import { useNavigate } from "react-router-dom";
-
-const folders = [
-  {
-    id: 1,
-    name: "College",
-  },
-  {
-    id: 2,
-    name: "Photos",
-  },
-  {
-    id: 3,
-    name: "Documents",
-  },
-];
 
 const files = [
   {
@@ -47,12 +32,36 @@ const DashboardPage = () => {
   const navigate = useNavigate();
 
   const { view } = useViewStore();
+
+  const [folders, setFolders] = useState([
+    {
+      id: 1,
+      name: "College",
+    },
+
+    {
+      id: 2,
+      name: "Photos",
+    },
+
+    {
+      id: 3,
+      name: "Documents",
+    },
+  ]);
+
   return (
     <div>
       <h1 className="mb-8 text-4xl font-bold text-slate-900">Dashboard</h1>
 
       <Breadcrumb items={breadcrumbItems} />
-      <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
+      <div
+        className={
+          view === "grid"
+            ? "grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3"
+            : "space-y-4"
+        }
+      >
         {folders.map((folder) => (
           <FolderCard
             key={folder.id}
