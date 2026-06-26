@@ -1,8 +1,11 @@
 import React, { useState } from "react";
+import useFolderStore from "../store/useFolderStore";
 
 const CreateFolderModal = ({ isOpen, onClose }) => {
   const [folderName, setFolderName] = useState("");
-  
+
+  const { createFolder } = useFolderStore();
+
   if (!isOpen) return null;
 
   return (
@@ -35,7 +38,7 @@ const CreateFolderModal = ({ isOpen, onClose }) => {
                 return;
               }
 
-              console.log(folderName);
+              createFolder(folderName);
 
               setFolderName("");
               onClose();

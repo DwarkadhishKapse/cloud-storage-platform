@@ -4,6 +4,7 @@ import Breadcrumb from "../components/Breadcrumb";
 import FileCard from "../components/FileCard";
 import useViewStore from "../store/useViewStore";
 import { useNavigate } from "react-router-dom";
+import useFolderStore from "../store/useFolderStore";
 
 const files = [
   {
@@ -33,22 +34,7 @@ const DashboardPage = () => {
 
   const { view } = useViewStore();
 
-  const [folders, setFolders] = useState([
-    {
-      id: 1,
-      name: "College",
-    },
-
-    {
-      id: 2,
-      name: "Photos",
-    },
-
-    {
-      id: 3,
-      name: "Documents",
-    },
-  ]);
+  const { folders } = useFolderStore()
 
   return (
     <div>
