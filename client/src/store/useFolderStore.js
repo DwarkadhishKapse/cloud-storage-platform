@@ -26,6 +26,11 @@ const useFolderStore = create((set) => ({
         },
       ],
     })),
+
+  deleteFolder: (id) =>
+    set((state) => ({
+      folders: state.folders.filter((folder) => folder.id !== id),
+    })),
 }));
 
 export default useFolderStore;

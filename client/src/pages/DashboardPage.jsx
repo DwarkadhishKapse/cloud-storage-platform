@@ -5,6 +5,7 @@ import FileCard from "../components/FileCard";
 import useViewStore from "../store/useViewStore";
 import { useNavigate } from "react-router-dom";
 import useFolderStore from "../store/useFolderStore";
+import DeleteFolderModal from "../components/DeleteFolderModal";
 
 const files = [
   {
@@ -34,7 +35,9 @@ const DashboardPage = () => {
 
   const { view } = useViewStore();
 
-  const { folders } = useFolderStore()
+  const { folders, deleteFolder } = useFolderStore();
+
+  const [folderToDelete, setFolderToDelete] = useState(null);
 
   return (
     <div>
@@ -53,6 +56,7 @@ const DashboardPage = () => {
             key={folder.id}
             name={folder.name}
             onClick={() => navigate(`/folder/${folder.id}`)}
+            onDelete={() => setFolderToDelete(folder)}
           />
         ))}
       </div>
@@ -76,6 +80,15 @@ const DashboardPage = () => {
             />
           ))}
         </div>
+
+        <DeleteFolderModal
+          folder={folderToDelete}
+          onClose={() => setFolderToDelete(null)}
+          onConfirm={() => {
+            deleteFolder(folderToDelete.id);
+            setFolderToDelete(null);
+          }}
+        />
       </div>
     </div>
   );
