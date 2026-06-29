@@ -44,77 +44,97 @@ const DashboardPage = () => {
 
   const { folders, deleteFolder, renameFolder } = useFolderStore();
 
-  const normalizeQuery = searchQuery.toLowerCase().trim();
+  const normalizedQuery = searchQuery.toLowerCase().trim();
 
   const filteredFolders = folders.filter((folder) =>
-    folder.name.toLowerCase().includes(normalizeQuery),
+    folder.name.toLowerCase().includes(normalizedQuery),
   );
 
   const filteredFiles = files.filter((file) =>
-    file.name.toLowerCase().includes(normalizeQuery),
+    file.name.toLowerCase().includes(normalizedQuery),
   );
+
+  const hasResults = filteredFolders.length > 0 || filteredFiles.length > 0;
 
   return (
     <div>
       <h1 className="mb-8 text-4xl font-bold text-slate-900">Dashboard</h1>
 
       <Breadcrumb items={breadcrumbItems} />
-      <div
-        className={
-          view === "grid"
-            ? "grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3"
-            : "space-y-4"
-        }
-      >
-        {filteredFolders.map((folder) => (
-          <FolderCard
-            key={folder.id}
-            name={folder.name}
-            onClick={() => navigate(`/folder/${folder.id}`)}
-            onDelete={() => setFolderToDelete(folder)}
-            onEdit={() => setFolderToEdit(folder)}
-          />
-        ))}
-      </div>
 
-      <div className="mt-10">
-        <h2 className="mb-5 text-2xl font-bold text-slate-900">Files</h2>
+      {!hasResults && normalizedQuery && (
+        <div className="mt-20 text-center">
+          <h2 className="text-2xl font-semibold text-slate-700">
+            🔍 No results found
+          </h2>
 
-        <div
-          className={
-            view === "grid"
-              ? "grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3"
-              : "space-y-4"
-          }
-        >
-          {filteredFiles.map((file) => (
-            <FileCard
-              key={file.id}
-              name={file.name}
-              size={file.size}
-              type={file.type}
-            />
-          ))}
+          <p className="mt-3 text-slate-500">Try another search term.</p>
         </div>
+      )}
 
-        <DeleteFolderModal
-          folder={folderToDelete}
-          onClose={() => setFolderToDelete(null)}
-          onConfirm={() => {
-            deleteFolder(folderToDelete.id);
-            setFolderToDelete(null);
-          }}
-        />
+      {filteredFolders.length > 0 && (
+        <div className="mt-10">
+          <h2 className="mb-5 text-2xl font-bold text-slate-900">Folders</h2>
+          <div
+            className={
+              view === "grid"
+                ? "grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3"
+                : "space-y-4"
+            }
+          >
+            {filteredFolders.map((folder) => (
+              <FolderCard
+                key={folder.id}
+                name={folder.name}
+                onClick={() => navigate(`/folder/${folder.id}`)}
+                onDelete={() => setFolderToDelete(folder)}
+                onEdit={() => setFolderToEdit(folder)}
+              />
+            ))}
+          </div>
+        </div>
+      )}
 
-        <RenameFolderModal
-          folder={folderToEdit}
-          onClose={() => setFolderToEdit(null)}
-          onConfirm={(newName) => {
-            renameFolder(folderToEdit.id, newName);
-            setFolderToEdit(null);
-          }}
-        />
-      </div>
+      {filteredFiles.length > 0 && (
+        <div className="mt-10">
+          <h2 className="mb-5 text-2xl font-bold text-slate-900">Files</h2>
+
+          <div
+            className={
+              view === "grid"
+                ? "grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3"
+                : "space-y-4"
+            }
+          >
+            {filteredFiles.map((file) => (
+              <FileCard
+                key={file.id}
+                name={file.name}
+                size={file.size}
+                type={file.type}
+              />
+            ))}
+          </div>
+        </div>
+      )}
+
+      <DeleteFolderModal
+        folder={folderToDelete}
+        onClose={() => setFolderToDelete(null)}
+        onConfirm={() => {
+          deleteFolder(folderToDelete.id);
+          setFolderToDelete(null);
+        }}
+      />
+
+      <RenameFolderModal
+        folder={folderToEdit}
+        onClose={() => setFolderToEdit(null)}
+        onConfirm={(newName) => {
+          renameFolder(folderToEdit.id, newName);
+          setFolderToEdit(null);
+        }}
+      />
     </div>
   );
 };
