@@ -5,6 +5,7 @@ import FileCard from "../components/FileCard";
 import useViewStore from "../store/useViewStore";
 import { useNavigate } from "react-router-dom";
 import useFolderStore from "../store/useFolderStore";
+import useSearchStore from "../store/useSearchStore";
 import DeleteFolderModal from "../components/DeleteFolderModal";
 import RenameFolderModal from "../components/RenameFolderModal";
 
@@ -36,10 +37,22 @@ const DashboardPage = () => {
 
   const { view } = useViewStore();
 
+  const { searchQuery } = useSearchStore();
+
   const [folderToDelete, setFolderToDelete] = useState(null);
   const [folderToEdit, setFolderToEdit] = useState(null);
 
   const { folders, deleteFolder, renameFolder } = useFolderStore();
+
+  const normalizeQuery = searchQuery.toLowerCase().trim();
+
+  const filteredFolders = folders.filter((folder) =>
+    folder.name.toLowerCase().includes(normalizeQuery),
+  );
+
+  const filteredFiles = files.filter((file) =>
+    file.name.toLowerCase().includes(normalizeQuery),
+  );
 
   return (
     <div>
@@ -53,7 +66,7 @@ const DashboardPage = () => {
             : "space-y-4"
         }
       >
-        {folders.map((folder) => (
+        {filteredFolders.map((folder) => (
           <FolderCard
             key={folder.id}
             name={folder.name}
@@ -74,7 +87,7 @@ const DashboardPage = () => {
               : "space-y-4"
           }
         >
-          {files.map((file) => (
+          {filteredFiles.map((file) => (
             <FileCard
               key={file.id}
               name={file.name}
