@@ -31,6 +31,13 @@ const useFolderStore = create((set) => ({
     set((state) => ({
       folders: state.folders.filter((folder) => folder.id !== id),
     })),
+
+  renameFolder: (id, newName) =>
+    set((state) => ({
+      folders: state.folders.map((folder) =>
+        folder.id === id ? { ...folder, name: newName } : folder,
+      ),
+    })),
 }));
 
 export default useFolderStore;

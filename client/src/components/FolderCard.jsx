@@ -1,6 +1,6 @@
-import { FiFolder, FiTrash2 } from "react-icons/fi";
+import { FiFolder, FiTrash2, FiEdit2 } from "react-icons/fi";
 
-const FolderCard = ({ name, onClick, onDelete }) => {
+const FolderCard = ({ name, onClick, onDelete, onEdit }) => {
   return (
     <div
       onClick={onClick}
@@ -11,15 +11,26 @@ const FolderCard = ({ name, onClick, onDelete }) => {
         <h3 className="font-semibold text-slate-800">{name}</h3>
       </div>
 
-      <button
-        onClick={(e) => {
-          e.stopPropagation();
-          onDelete();
-        }}
-        className="rounded-xl p-2 text-slate-400 transition hover:bg-red-50 hover:text-red-500"
-      >
-        <FiTrash2 size={18} />
-      </button>
+      <div className="flex items-center gap-2">
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            onEdit();
+          }}
+          className="rounded-xl p-2 text-slate-400 transition hover:bg-emerald-50 hover:text-emerald-600"
+        >
+          <FiEdit2 size={18} />
+        </button>
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            onDelete();
+          }}
+          className="rounded-xl p-2 text-slate-400 transition hover:bg-red-50 hover:text-red-500"
+        >
+          <FiTrash2 size={18} />
+        </button>
+      </div>
     </div>
   );
 };
