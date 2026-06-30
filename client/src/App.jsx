@@ -1,4 +1,5 @@
 import React from "react";
+import FavoritesPage from "./pages/FavoritesPage";
 
 const App = () => {
   return (

@@ -3,11 +3,11 @@ import { FaStar, FaRegStar } from "react-icons/fa";
 
 const FolderCard = ({
   name,
+  isFavorite,
   onClick,
   onDelete,
   onEdit,
   onFavorite,
-  isFavorite,
 }) => {
   return (
     <div
@@ -23,7 +23,9 @@ const FolderCard = ({
         <button
           onClick={(e) => {
             e.stopPropagation();
-            onFavorite();
+            if (onFavorite) {
+              onFavorite();
+            }
           }}
         >
           {isFavorite ? (
@@ -35,7 +37,9 @@ const FolderCard = ({
         <button
           onClick={(e) => {
             e.stopPropagation();
-            onEdit();
+            if (onEdit) {
+              onEdit();
+            }
           }}
           className="rounded-xl p-2 text-slate-400 transition hover:bg-emerald-50 hover:text-emerald-600"
         >
@@ -44,7 +48,9 @@ const FolderCard = ({
         <button
           onClick={(e) => {
             e.stopPropagation();
-            onDelete();
+            if (onDelete) {
+              onDelete();
+            }
           }}
           className="rounded-xl p-2 text-slate-400 transition hover:bg-red-50 hover:text-red-500"
         >

@@ -42,7 +42,7 @@ const DashboardPage = () => {
   const [folderToDelete, setFolderToDelete] = useState(null);
   const [folderToEdit, setFolderToEdit] = useState(null);
 
-  const { folders, deleteFolder, renameFolder, toggleFolder } =
+  const { folders, deleteFolder, renameFolder, toggleFavorite } =
     useFolderStore();
 
   const normalizedQuery = searchQuery.toLowerCase().trim();
@@ -91,7 +91,7 @@ const DashboardPage = () => {
                 onClick={() => navigate(`/folder/${folder.id}`)}
                 onDelete={() => setFolderToDelete(folder)}
                 onEdit={() => setFolderToEdit(folder)}
-                onFavorite={() => toggleFolder(folder.id)}
+                onFavorite={() => toggleFavorite(folder.id)}
               />
             ))}
           </div>

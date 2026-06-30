@@ -43,7 +43,7 @@ const useFolderStore = create((set) => ({
       ),
     })),
 
-  toggleFolder: (id) =>
+  toggleFavorite: (id) =>
     set((state) => ({
       folders: state.folders.map((folder) =>
         folder.id === id
