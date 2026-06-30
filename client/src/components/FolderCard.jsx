@@ -1,6 +1,14 @@
 import { FiFolder, FiTrash2, FiEdit2 } from "react-icons/fi";
+import { FaStar, FaRegStar } from "react-icons/fa";
 
-const FolderCard = ({ name, onClick, onDelete, onEdit }) => {
+const FolderCard = ({
+  name,
+  onClick,
+  onDelete,
+  onEdit,
+  onFavorite,
+  isFavorite,
+}) => {
   return (
     <div
       onClick={onClick}
@@ -12,6 +20,18 @@ const FolderCard = ({ name, onClick, onDelete, onEdit }) => {
       </div>
 
       <div className="flex items-center gap-2">
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            onFavorite();
+          }}
+        >
+          {isFavorite ? (
+            <FaStar size={18} className="text-yellow-500" />
+          ) : (
+            <FaRegStar size={18} className="text-slate-400" />
+          )}
+        </button>
         <button
           onClick={(e) => {
             e.stopPropagation();

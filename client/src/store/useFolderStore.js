@@ -5,14 +5,17 @@ const useFolderStore = create((set) => ({
     {
       id: 1,
       name: "College",
+      isFavorite: false,
     },
     {
       id: 2,
       name: "Photos",
+      isFavorite: false,
     },
     {
       id: 3,
       name: "Documents",
+      isFavorite: false,
     },
   ],
 
@@ -23,6 +26,7 @@ const useFolderStore = create((set) => ({
         {
           id: Date.now(),
           name,
+          isFavorite: false,
         },
       ],
     })),
@@ -36,6 +40,15 @@ const useFolderStore = create((set) => ({
     set((state) => ({
       folders: state.folders.map((folder) =>
         folder.id === id ? { ...folder, name: newName } : folder,
+      ),
+    })),
+
+  toggleFolder: (id) =>
+    set((state) => ({
+      folders: state.folders.map((folder) =>
+        folder.id === id
+          ? { ...folder, isFavorite: !folder.isFavorite }
+          : folder,
       ),
     })),
 }));
