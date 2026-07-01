@@ -1,9 +1,12 @@
-import React from "react";
+import React, { useState } from "react";
 import useFolderStore from "../store/useFolderStore";
 import TrashFolderCard from "../components/TrashFolderCard";
+import DeleteForeverModal from "../components/DeleteForeverModal";
 
 const TrashPage = () => {
-  const { folders, restoreFolder, permanentDeleteFolder } = useFolderStore();
+  const { folders, restoreFolder, permanentlyDeleteFolder } = useFolderStore();
+
+  const [folderToDelete, setFolderToDelete] = useState(null);
 
   const trashFolders = folders.filter((folder) => folder.isDeleted);
 
@@ -27,10 +30,20 @@ const TrashPage = () => {
             key={folder.id}
             name={folder.name}
             onRestore={() => restoreFolder(folder.id)}
-            onDeleteForever={()=>permanentDeleteFolder(folder.id)}
+            onDeleteForever={() => setFolderToDelete(folder)}
           />
         ))}
       </div>
+
+      <DeleteForeverModal
+        folder={folderToDelete}
+        onClose={() => setFolderToDelete(null)}
+        onConfirm={() => {
+          if (!folderToDelete) return;
+          permanentlyDeleteFolder(folderToDelete.id);
+          setFolderToDelete(null);
+        }}
+      />
     </div>
   );
 };

@@ -49,7 +49,7 @@ const useFolderStore = create((set) => ({
       ),
     })),
 
-  permanentDeleteFolder: (id) =>
+  permanentlyDeleteFolder: (id) =>
     set((state) => ({
       folders: state.folders.filter((folder) => folder.id !== id),
     })),
