@@ -41,14 +41,17 @@ const useFolderStore = create((set) => ({
         folder.id === id ? { ...folder, isDeleted: true } : folder,
       ),
     })),
-    
+
   restoreFolder: (id) =>
-    set((state)=>({
-      folders: state.folders.map((folder)=>
-        folder.id === id
-        ? {...folder, isDeleted: false}
-        : folder
+    set((state) => ({
+      folders: state.folders.map((folder) =>
+        folder.id === id ? { ...folder, isDeleted: false } : folder,
       ),
+    })),
+
+  permanentDeleteFolder: (id) =>
+    set((state) => ({
+      folders: state.folders.filter((folder) => folder.id !== id),
     })),
 
   renameFolder: (id, newName) =>

@@ -3,7 +3,7 @@ import useFolderStore from "../store/useFolderStore";
 import TrashFolderCard from "../components/TrashFolderCard";
 
 const TrashPage = () => {
-  const { folders, restoreFolder } = useFolderStore();
+  const { folders, restoreFolder, permanentDeleteFolder } = useFolderStore();
 
   const trashFolders = folders.filter((folder) => folder.isDeleted);
 
@@ -27,6 +27,7 @@ const TrashPage = () => {
             key={folder.id}
             name={folder.name}
             onRestore={() => restoreFolder(folder.id)}
+            onDeleteForever={()=>permanentDeleteFolder(folder.id)}
           />
         ))}
       </div>

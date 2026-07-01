@@ -1,7 +1,7 @@
 import React from "react";
 import { FiFolder, FiRotateCcw } from "react-icons/fi";
 
-const TrashFolderCard = ({ name, onRestore }) => {
+const TrashFolderCard = ({ name, onRestore, onDeleteForever }) => {
   return (
     <div className="flex items-center justify-between rounded-2xl border border-slate-200 bg-white p-5 transition-all duration-200 hover:shadow-md">
       <div className="flex items-center gap-4">
@@ -13,8 +13,15 @@ const TrashFolderCard = ({ name, onRestore }) => {
         onClick={onRestore}
         className="flex items-center gap-2 rounded-xl bg-emerald-50 px-4 py-2 text-emerald-700 transition hover:bg-emerald-100"
       >
-        <FiRotateCcw size={16}/>
+        <FiRotateCcw size={16} />
         Restore
+      </button>
+
+      <button
+        onClick={onDeleteForever}
+        className="flex items-center gap-2 rounded-xl bg-red-50 px-4 py-2 text-red-600 transition hover:bg-red-100"
+      >
+        Delete Forever
       </button>
     </div>
   );
