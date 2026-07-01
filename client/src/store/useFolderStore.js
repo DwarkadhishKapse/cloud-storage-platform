@@ -6,16 +6,19 @@ const useFolderStore = create((set) => ({
       id: 1,
       name: "College",
       isFavorite: false,
+      isDeleted: false,
     },
     {
       id: 2,
       name: "Photos",
       isFavorite: false,
+      isDeleted: false,
     },
     {
       id: 3,
       name: "Documents",
       isFavorite: false,
+      isDeleted: false,
     },
   ],
 
@@ -27,13 +30,25 @@ const useFolderStore = create((set) => ({
           id: Date.now(),
           name,
           isFavorite: false,
+          isDeleted: false,
         },
       ],
     })),
 
-  deleteFolder: (id) =>
+  moveToTrash: (id) =>
     set((state) => ({
-      folders: state.folders.filter((folder) => folder.id !== id),
+      folders: state.folders.map((folder) =>
+        folder.id === id ? { ...folder, isDeleted: true } : folder,
+      ),
+    })),
+    
+  restoreFolder: (id) =>
+    set((state)=>({
+      folders: state.folders.map((folder)=>
+        folder.id === id
+        ? {...folder, isDeleted: false}
+        : folder
+      ),
     })),
 
   renameFolder: (id, newName) =>

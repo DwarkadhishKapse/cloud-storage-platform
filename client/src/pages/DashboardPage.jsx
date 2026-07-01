@@ -42,12 +42,14 @@ const DashboardPage = () => {
   const [folderToDelete, setFolderToDelete] = useState(null);
   const [folderToEdit, setFolderToEdit] = useState(null);
 
-  const { folders, deleteFolder, renameFolder, toggleFavorite } =
+  const { folders, moveToTrash, renameFolder, toggleFavorite } =
     useFolderStore();
 
   const normalizedQuery = searchQuery.toLowerCase().trim();
 
-  const filteredFolders = folders.filter((folder) =>
+  const activeFolders = folders.filter((folder) => !folder.isDeleted);
+
+  const filteredFolders = activeFolders.filter((folder) =>
     folder.name.toLowerCase().includes(normalizedQuery),
   );
 
@@ -125,7 +127,8 @@ const DashboardPage = () => {
         folder={folderToDelete}
         onClose={() => setFolderToDelete(null)}
         onConfirm={() => {
-          deleteFolder(folderToDelete.id);
+          if (!folderToDelete) return;
+          moveToTrash(folderToDelete.id);
           setFolderToDelete(null);
         }}
       />
@@ -134,6 +137,7 @@ const DashboardPage = () => {
         folder={folderToEdit}
         onClose={() => setFolderToEdit(null)}
         onConfirm={(newName) => {
+          if (!folderToEdit) return;
           renameFolder(folderToEdit.id, newName);
           setFolderToEdit(null);
         }}
