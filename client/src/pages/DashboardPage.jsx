@@ -8,33 +8,15 @@ import useFolderStore from "../store/useFolderStore";
 import useSearchStore from "../store/useSearchStore";
 import DeleteFolderModal from "../components/DeleteFolderModal";
 import RenameFolderModal from "../components/RenameFolderModal";
+import useFileStore from "../store/useFileStore";
 
-const files = [
-  {
-    id: 1,
-    name: "Resume.pdf",
-    size: "2.3 MB",
-    type: "pdf",
-  },
-  {
-    id: 2,
-    name: "DBMS Notes.pdf",
-    size: "5.8 MB",
-    type: "pdf",
-  },
-  {
-    id: 3,
-    name: "Goa.jpg",
-    size: "1.2 MB",
-    type: "image",
-  },
-];
 
 const breadcrumbItems = ["Home"];
 
 const DashboardPage = () => {
   const navigate = useNavigate();
-
+  
+  const { files } = useFileStore();
   const { view } = useViewStore();
 
   const { searchQuery } = useSearchStore();
@@ -48,12 +30,13 @@ const DashboardPage = () => {
   const normalizedQuery = searchQuery.toLowerCase().trim();
 
   const activeFolders = folders.filter((folder) => !folder.isDeleted);
+  const activeFiles = files.filter((file)=> !file.isDeleted)
 
   const filteredFolders = activeFolders.filter((folder) =>
     folder.name.toLowerCase().includes(normalizedQuery),
   );
 
-  const filteredFiles = files.filter((file) =>
+  const filteredFiles = activeFiles.filter((file) =>
     file.name.toLowerCase().includes(normalizedQuery),
   );
 

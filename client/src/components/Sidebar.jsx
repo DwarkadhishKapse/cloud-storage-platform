@@ -28,7 +28,7 @@ const navItems = [
   },
 ];
 
-const Sidebar = ({ onNewFolder }) => {
+const Sidebar = ({ onNewFolder, onUploadFile }) => {
   const [showNewMenu, setShowNewMenu] = useState(false);
 
   return (
@@ -60,7 +60,7 @@ const Sidebar = ({ onNewFolder }) => {
 
               <button
                 onClick={() => {
-                  alert("Upload feature coming soon");
+                  onUploadFile();
                   setShowNewMenu(false);
                 }}
                 className="flex w-full items-center gap-3 rounded-xl px-4 py-3 text-left text-slate-700 hover:bg-slate-100"
