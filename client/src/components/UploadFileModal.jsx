@@ -1,5 +1,6 @@
 import React, { useRef, useState } from "react";
 import useFileStore from "../store/useFileStore";
+import { formatFileSize } from "../utils/formatFileSize";
 
 const UploadFileModal = ({ isOpen, onClose }) => {
   const [selectedFile, setSelectedFile] = useState(null);
@@ -14,14 +15,6 @@ const UploadFileModal = ({ isOpen, onClose }) => {
     if (file) {
       setSelectedFile(file);
     }
-  };
-
-  const formatFileSize = (bytes) => {
-    if (bytes < 1024 * 1024) {
-      return `${(bytes / 1024).toFixed(2)} KB`;
-    }
-
-    return `${(bytes / (1024 * 1024)).toFixed(2)} MB`;
   };
 
   const handleUpload = () => {
