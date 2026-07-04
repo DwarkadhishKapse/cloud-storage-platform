@@ -1,6 +1,6 @@
 import React from "react";
 
-const DeleteForeverModal = ({ folder, onClose, onConfirm }) => {
+const DeleteForeverFolderModal = ({ folder, onClose, onConfirm }) => {
   if (!folder) return null;
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black/30">
@@ -35,4 +35,4 @@ const DeleteForeverModal = ({ folder, onClose, onConfirm }) => {
   );
 };
 
-export default DeleteForeverModal;
+export default DeleteForeverFolderModal;

@@ -1,14 +1,17 @@
 import React, { useState } from "react";
-import FolderCard from "../components/FolderCard";
-import Breadcrumb from "../components/Breadcrumb";
-import FileCard from "../components/FileCard";
-import useViewStore from "../store/useViewStore";
 import { useNavigate } from "react-router-dom";
-import useFolderStore from "../store/useFolderStore";
-import useSearchStore from "../store/useSearchStore";
+
+import FolderCard from "../components/FolderCard";
+import FileCard from "../components/FileCard";
+import Breadcrumb from "../components/Breadcrumb";
 import DeleteFolderModal from "../components/DeleteFolderModal";
+import DeleteFileModal from "../components/DeleteFileModal";
 import RenameFolderModal from "../components/RenameFolderModal";
+
+import useViewStore from "../store/useViewStore";
+import useFolderStore from "../store/useFolderStore";
 import useFileStore from "../store/useFileStore";
+import useSearchStore from "../store/useSearchStore";
 import { formatFileSize } from "../utils/formatFileSize";
 
 const breadcrumbItems = ["Home"];
@@ -16,16 +19,17 @@ const breadcrumbItems = ["Home"];
 const DashboardPage = () => {
   const navigate = useNavigate();
 
-  const { files, toggleFileFavorite } = useFileStore();
   const { view } = useViewStore();
-
   const { searchQuery } = useSearchStore();
 
-  const [folderToDelete, setFolderToDelete] = useState(null);
-  const [folderToEdit, setFolderToEdit] = useState(null);
+  const { files, toggleFileFavorite, moveFileToTrash } = useFileStore();
 
-  const { folders, moveToTrash, renameFolder, toggleFavorite } =
+  const { folders, moveToTrash, renameFolder, toggleFolderFavorite } =
     useFolderStore();
+
+  const [folderToDelete, setFolderToDelete] = useState(null);
+  const [fileToDelete, setFileToDelete] = useState(null);
+  const [folderToEdit, setFolderToEdit] = useState(null);
 
   const normalizedQuery = searchQuery.toLowerCase().trim();
 
@@ -61,6 +65,7 @@ const DashboardPage = () => {
       {filteredFolders.length > 0 && (
         <div className="mt-10">
           <h2 className="mb-5 text-2xl font-bold text-slate-900">Folders</h2>
+
           <div
             className={
               view === "grid"
@@ -76,7 +81,7 @@ const DashboardPage = () => {
                 onClick={() => navigate(`/folder/${folder.id}`)}
                 onDelete={() => setFolderToDelete(folder)}
                 onEdit={() => setFolderToEdit(folder)}
-                onFavorite={() => toggleFavorite(folder.id)}
+                onFavorite={() => toggleFolderFavorite(folder.id)}
               />
             ))}
           </div>
@@ -100,7 +105,8 @@ const DashboardPage = () => {
                 name={file.name}
                 size={formatFileSize(file.size)}
                 isFavorite={file.isFavorite}
-                onFavorite={()=>toggleFileFavorite(file.id)}
+                onFavorite={() => toggleFileFavorite(file.id)}
+                onDelete={() => setFileToDelete(file)}
               />
             ))}
           </div>
@@ -112,8 +118,20 @@ const DashboardPage = () => {
         onClose={() => setFolderToDelete(null)}
         onConfirm={() => {
           if (!folderToDelete) return;
+
           moveToTrash(folderToDelete.id);
           setFolderToDelete(null);
+        }}
+      />
+
+      <DeleteFileModal
+        file={fileToDelete}
+        onClose={() => setFileToDelete(null)}
+        onConfirm={() => {
+          if (!fileToDelete) return;
+
+          moveFileToTrash(fileToDelete.id);
+          setFileToDelete(null);
         }}
       />
 
@@ -122,6 +140,7 @@ const DashboardPage = () => {
         onClose={() => setFolderToEdit(null)}
         onConfirm={(newName) => {
           if (!folderToEdit) return;
+
           renameFolder(folderToEdit.id, newName);
           setFolderToEdit(null);
         }}
