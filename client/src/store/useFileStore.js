@@ -48,13 +48,12 @@ const useFileStore = create((set) => ({
     }));
   },
 
-  toggleFavorite: (id) => {
+  toggleFileFavorite: (id) =>
     set((state) => ({
       files: state.files.map((file) =>
         file.id === id ? { ...file, isFavorite: !file.isFavorite } : file,
       ),
-    }));
-  },
+    })),
 
   moveFileToTrash: (id) => {
     set((state) => ({

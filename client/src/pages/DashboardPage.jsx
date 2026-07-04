@@ -9,14 +9,14 @@ import useSearchStore from "../store/useSearchStore";
 import DeleteFolderModal from "../components/DeleteFolderModal";
 import RenameFolderModal from "../components/RenameFolderModal";
 import useFileStore from "../store/useFileStore";
-
+import { formatFileSize } from "../utils/formatFileSize";
 
 const breadcrumbItems = ["Home"];
 
 const DashboardPage = () => {
   const navigate = useNavigate();
-  
-  const { files } = useFileStore();
+
+  const { files, toggleFileFavorite } = useFileStore();
   const { view } = useViewStore();
 
   const { searchQuery } = useSearchStore();
@@ -30,7 +30,7 @@ const DashboardPage = () => {
   const normalizedQuery = searchQuery.toLowerCase().trim();
 
   const activeFolders = folders.filter((folder) => !folder.isDeleted);
-  const activeFiles = files.filter((file)=> !file.isDeleted)
+  const activeFiles = files.filter((file) => !file.isDeleted);
 
   const filteredFolders = activeFolders.filter((folder) =>
     folder.name.toLowerCase().includes(normalizedQuery),
@@ -98,8 +98,9 @@ const DashboardPage = () => {
               <FileCard
                 key={file.id}
                 name={file.name}
-                size={file.size}
-                type={file.type}
+                size={formatFileSize(file.size)}
+                isFavorite={file.isFavorite}
+                onFavorite={()=>toggleFileFavorite(file.id)}
               />
             ))}
           </div>
