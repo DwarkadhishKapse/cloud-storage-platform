@@ -12,7 +12,7 @@ const FolderCard = ({
   return (
     <div
       onClick={onClick}
-      className="flex cursor-pointer items-center gap-4 rounded-2xl border border-slate-200 bg-white p-5 transition-all duration-200 hover:border-emerald-300 hover:shadow-md"
+      className="flex justify-between cursor-pointer items-center gap-4 rounded-2xl border border-slate-200 bg-white p-5 transition-all duration-200 hover:border-emerald-300 hover:shadow-md"
     >
       <div className="flex items-center gap-4">
         <FiFolder size={28} className="text-emerald-600" />
@@ -27,6 +27,7 @@ const FolderCard = ({
               onFavorite();
             }
           }}
+          className="rounded-xl p-2 transition hover:bg-yellow-50"
         >
           {isFavorite ? (
             <FaStar size={18} className="text-yellow-500" />
