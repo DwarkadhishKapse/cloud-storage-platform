@@ -1,6 +1,6 @@
 import React from "react";
-import { FiFileText, FiTrash2 } from "react-icons/fi";
-import { FaStar, FaRegStar } from "react-icons/fa";
+import FileActionsMenu from "./FileActionsMenu";
+import { FiFileText } from "react-icons/fi";
 
 const FileCard = ({
   name,
@@ -9,6 +9,7 @@ const FileCard = ({
   isFavorite,
   onFavorite,
   onDelete,
+  onDownload,
 }) => {
   return (
     <div
@@ -24,31 +25,12 @@ const FileCard = ({
         </div>
       </div>
 
-      <div className="flex items-center gap-2">
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-            onFavorite?.();
-          }}
-          className="rounded-xl p-2 transition-colors hover:bg-yellow-50"
-        >
-          {isFavorite ? (
-            <FaStar size={18} className="text-yellow-500" />
-          ) : (
-            <FaRegStar size={18} className="text-slate-400" />
-          )}
-        </button>
-
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-            onDelete?.();
-          }}
-          className="rounded-xl p-2 text-slate-400 transition-colors hover:bg-red-50 hover:text-red-500"
-        >
-          <FiTrash2 size={18} />
-        </button>
-      </div>
+      <FileActionsMenu
+        isFavorite={isFavorite}
+        onFavorite={onFavorite}
+        onDownload={onDownload}
+        onDelete={onDelete}
+      />
     </div>
   );
 };
