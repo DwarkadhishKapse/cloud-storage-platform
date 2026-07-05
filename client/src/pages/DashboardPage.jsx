@@ -7,6 +7,7 @@ import Breadcrumb from "../components/Breadcrumb";
 import DeleteFolderModal from "../components/DeleteFolderModal";
 import DeleteFileModal from "../components/DeleteFileModal";
 import RenameFolderModal from "../components/RenameFolderModal";
+import PreviewFileModal from "../components/PreviewFileModal";
 
 import useViewStore from "../store/useViewStore";
 import useFolderStore from "../store/useFolderStore";
@@ -22,7 +23,14 @@ const DashboardPage = () => {
   const { view } = useViewStore();
   const { searchQuery } = useSearchStore();
 
-  const { files, toggleFileFavorite, moveFileToTrash } = useFileStore();
+  const {
+    files,
+    previewFile,
+    setPreviewFile,
+    closePreview,
+    toggleFileFavorite,
+    moveFileToTrash,
+  } = useFileStore();
 
   const { folders, moveToTrash, renameFolder, toggleFolderFavorite } =
     useFolderStore();
@@ -105,6 +113,7 @@ const DashboardPage = () => {
                 name={file.name}
                 size={formatFileSize(file.size)}
                 isFavorite={file.isFavorite}
+                onClick={() => setPreviewFile(file)}
                 onFavorite={() => toggleFileFavorite(file.id)}
                 onDelete={() => setFileToDelete(file)}
               />
@@ -145,6 +154,8 @@ const DashboardPage = () => {
           setFolderToEdit(null);
         }}
       />
+
+      <PreviewFileModal file={previewFile} onClose={closePreview} />
     </div>
   );
 };

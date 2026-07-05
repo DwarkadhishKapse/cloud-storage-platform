@@ -6,7 +6,7 @@ const useFileStore = create((set) => ({
       id: 1,
       name: "Resume.pdf",
       size: 2411724,
-      type: "pdf",
+      type: "application/pdf",
       isFavorite: false,
       isDeleted: false,
       createdAt: Date.now(),
@@ -16,7 +16,7 @@ const useFileStore = create((set) => ({
       id: 2,
       name: "DBMS Notes.pdf",
       size: 6081740,
-      type: "pdf",
+      type: "application/pdf",
       isFavorite: false,
       isDeleted: false,
       createdAt: Date.now(),
@@ -26,12 +26,24 @@ const useFileStore = create((set) => ({
       id: 3,
       name: "Goa.jpg",
       size: 1258291,
-      type: "image",
+      type: "image/jpeg",
       isFavorite: false,
       isDeleted: false,
       createdAt: Date.now(),
     },
   ],
+
+  previewFile: null,
+
+  setPreviewFile: (file) =>
+    set({
+      previewFile: file,
+    }),
+
+  closePreview: () =>
+    set({
+      previewFile: null,
+    }),
 
   addFile: (fileObject) => {
     set((state) => ({

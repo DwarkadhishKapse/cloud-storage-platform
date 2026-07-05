@@ -23,10 +23,13 @@ const UploadFileModal = ({ isOpen, onClose }) => {
       return;
     }
 
+    const previewUrl = URL.createObjectURL(selectedFile);
+
     addFile({
       name: selectedFile.name,
       size: selectedFile.size,
       type: selectedFile.type,
+      previewUrl,
     });
 
     setSelectedFile(null);
