@@ -14,6 +14,7 @@ import useFolderStore from "../store/useFolderStore";
 import useFileStore from "../store/useFileStore";
 import useSearchStore from "../store/useSearchStore";
 import { formatFileSize } from "../utils/formatFileSize";
+import { downloadFile } from "../utils/downloadFile";
 
 const breadcrumbItems = ["Home"];
 
@@ -115,6 +116,7 @@ const DashboardPage = () => {
                 isFavorite={file.isFavorite}
                 onClick={() => setPreviewFile(file)}
                 onFavorite={() => toggleFileFavorite(file.id)}
+                onDownload={() => downloadFile(file)}
                 onDelete={() => setFileToDelete(file)}
               />
             ))}

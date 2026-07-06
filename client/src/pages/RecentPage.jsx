@@ -1,10 +1,12 @@
 import React from "react";
 import FileCard from "../components/FileCard";
 import useFileStore from "../store/useFileStore";
+import PreviewFileModal from "../components/PreviewFileModal";
 import { formatFileSize } from "../utils/formatFileSize";
+import { downloadFile } from "../utils/downloadFile";
 
 const RecentPage = () => {
-  const { files } = useFileStore();
+  const { files, previewFile, setPreviewFile, closePreview } = useFileStore();
 
   const recentFiles = [...files]
     .filter((file) => !file.isDeleted)
@@ -28,10 +30,13 @@ const RecentPage = () => {
             key={file.id}
             name={file.name}
             size={formatFileSize(file.size)}
-            type={file.type}
+            isFavorite={file.isFavorite}
+            onClick={() => setPreviewFile(file)}
+            onDownload={() => downloadFile(file)}
           />
         ))}
       </div>
+      <PreviewFileModal file={previewFile} onClose={closePreview} />
     </div>
   );
 };

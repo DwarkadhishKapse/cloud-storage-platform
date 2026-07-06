@@ -4,12 +4,14 @@ import useFolderStore from "../store/useFolderStore";
 import useFileStore from "../store/useFileStore";
 import FolderCard from "../components/FolderCard";
 import FileCard from "../components/FileCard";
+import PreviewFileModal from "../components/PreviewFileModal";
 import { formatFileSize } from "../utils/formatFileSize";
+import { downloadFile } from "../utils/downloadFile";
 
 const FavoritesPage = () => {
   const navigate = useNavigate();
   const { folders, toggleFolderFavorite } = useFolderStore();
-  const { files, toggleFileFavorite } = useFileStore();
+  const { files, toggleFileFavorite, previewFile, setPreviewFile, closePreview } = useFileStore();
 
   const activeFolders = folders.filter((folder) => !folder.isDeleted);
   const favoriteFolders = activeFolders.filter((folder) => folder.isFavorite);
@@ -65,12 +67,16 @@ const FavoritesPage = () => {
                 name={file.name}
                 size={formatFileSize(file.size)}
                 isFavorite={file.isFavorite}
+                onClick={() => setPreviewFile(file)}
                 onFavorite={() => toggleFileFavorite(file.id)}
+                onDownload={() => downloadFile(file)}
               />
             ))}
           </div>
         </div>
       )}
+
+      <PreviewFileModal file={previewFile} onClose={closePreview} />
     </div>
   );
 };
