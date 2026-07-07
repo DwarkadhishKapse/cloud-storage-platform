@@ -8,6 +8,7 @@ import DeleteFolderModal from "../components/DeleteFolderModal";
 import DeleteFileModal from "../components/DeleteFileModal";
 import RenameFolderModal from "../components/RenameFolderModal";
 import PreviewFileModal from "../components/PreviewFileModal";
+import FileDetailsPanel from "../components/FileDetailsPanel";
 
 import useViewStore from "../store/useViewStore";
 import useFolderStore from "../store/useFolderStore";
@@ -29,6 +30,9 @@ const DashboardPage = () => {
     previewFile,
     setPreviewFile,
     closePreview,
+    setDetailFile,
+    detailFile,
+    closeDetail,
     toggleFileFavorite,
     moveFileToTrash,
   } = useFileStore();
@@ -118,6 +122,7 @@ const DashboardPage = () => {
                 onFavorite={() => toggleFileFavorite(file.id)}
                 onDownload={() => downloadFile(file)}
                 onDelete={() => setFileToDelete(file)}
+                onDetail={() => setDetailFile(file)}
               />
             ))}
           </div>
@@ -158,6 +163,8 @@ const DashboardPage = () => {
       />
 
       <PreviewFileModal file={previewFile} onClose={closePreview} />
+
+      <FileDetailsPanel file={detailFile} onClose={closeDetail} />
     </div>
   );
 };

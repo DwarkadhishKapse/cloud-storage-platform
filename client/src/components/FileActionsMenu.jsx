@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { FiMoreVertical, FiDownload, FiShare2, FiTrash2 } from "react-icons/fi";
-import { FaStar, FaRegStar } from "react-icons/fa";
+import { FaStar, FaRegStar, FaInfoCircle } from "react-icons/fa";
 
 const FileActionsMenu = ({
   isFavorite,
@@ -8,6 +8,7 @@ const FileActionsMenu = ({
   onDownload,
   onShare,
   onDelete,
+  onDetail,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   return (
@@ -42,6 +43,17 @@ const FileActionsMenu = ({
             <span>
               {isFavorite ? "Remove from Favorites" : "Add to Favorites"}
             </span>
+          </button>
+
+          <button
+            onClick={() => {
+              onDetail?.();
+              setIsOpen(false);
+            }}
+            className="flex w-full items-center gap-3 px-4 py-3 text-left text-slate-700 transition-colors hover:bg-slate-50"
+          >
+            <FaInfoCircle />
+            <span>View Details</span>
           </button>
 
           <button

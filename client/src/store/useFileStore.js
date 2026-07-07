@@ -35,6 +35,8 @@ const useFileStore = create((set) => ({
 
   previewFile: null,
 
+  detailFile: null,
+
   setPreviewFile: (file) =>
     set({
       previewFile: file,
@@ -43,6 +45,16 @@ const useFileStore = create((set) => ({
   closePreview: () =>
     set({
       previewFile: null,
+    }),
+
+  setDetailFile: (file) =>
+    set({
+      detailFile: file,
+    }),
+
+  closeDetail: () =>
+    set({
+      detailFile: null,
     }),
 
   addFile: (fileObject) => {

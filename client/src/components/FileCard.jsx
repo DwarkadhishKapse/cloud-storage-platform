@@ -10,6 +10,7 @@ const FileCard = ({
   onFavorite,
   onDelete,
   onDownload,
+  onDetail,
 }) => {
   return (
     <div
@@ -30,6 +31,7 @@ const FileCard = ({
         onFavorite={onFavorite}
         onDownload={onDownload}
         onDelete={onDelete}
+        onDetail={onDetail}
       />
     </div>
   );
