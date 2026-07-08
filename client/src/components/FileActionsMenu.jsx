@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { FiMoreVertical, FiDownload, FiShare2, FiTrash2 } from "react-icons/fi";
 import { FaStar, FaRegStar, FaInfoCircle } from "react-icons/fa";
 
@@ -11,8 +11,24 @@ const FileActionsMenu = ({
   onDetail,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
+
+  const menuRef = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (menuRef.current && !menuRef.current.contains(e.target)) {
+        setIsOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
   return (
-    <div className="relative">
+    <div ref={menuRef} className="relative">
       <button
         onClick={(e) => {
           e.stopPropagation();
