@@ -41,8 +41,8 @@ const DashboardPage = () => {
     useFolderStore();
 
   const [folderToDelete, setFolderToDelete] = useState(null);
-  const [fileToDelete, setFileToDelete] = useState(null);
   const [folderToEdit, setFolderToEdit] = useState(null);
+  const [fileToDelete, setFileToDelete] = useState(null);
 
   const normalizedQuery = searchQuery.toLowerCase().trim();
 
