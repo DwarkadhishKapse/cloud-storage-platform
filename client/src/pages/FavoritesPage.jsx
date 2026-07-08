@@ -4,6 +4,8 @@ import useFolderStore from "../store/useFolderStore";
 import useFileStore from "../store/useFileStore";
 import FolderCard from "../components/FolderCard";
 import FileCard from "../components/FileCard";
+import DeleteFolderModal from "../components/DeleteFolderModal";
+import RenameFolderModal from "../components/RenameFolderModal";
 import PreviewFileModal from "../components/PreviewFileModal";
 import DeleteFileModal from "../components/DeleteFileModal";
 import FileDetailsPanel from "../components/FileDetailsPanel";
@@ -12,7 +14,8 @@ import { downloadFile } from "../utils/downloadFile";
 
 const FavoritesPage = () => {
   const navigate = useNavigate();
-  const { folders, toggleFolderFavorite } = useFolderStore();
+  const { folders, toggleFolderFavorite, renameFolder, moveToTrash } =
+    useFolderStore();
   const {
     files,
     toggleFileFavorite,
@@ -25,6 +28,8 @@ const FavoritesPage = () => {
     moveFileToTrash,
   } = useFileStore();
 
+  const [folderToDelete, setFolderToDelete] = useState(null);
+  const [folderToEdit, setFolderToEdit] = useState(null);
   const [fileToDelete, setFileToDelete] = useState(null);
 
   const activeFolders = folders.filter((folder) => !folder.isDeleted);
@@ -62,8 +67,12 @@ const FavoritesPage = () => {
                 isFavorite={folder.isFavorite}
                 onClick={() => navigate(`/folder/${folder.id}`)}
                 onFavorite={() => toggleFolderFavorite(folder.id)}
-                onEdit={() => {}}
-                onDelete={() => {}}
+                onEdit={() => {
+                  setFolderToEdit(folder);
+                }}
+                onDelete={() => {
+                  setFolderToDelete(folder);
+                }}
               />
             ))}
           </div>
@@ -95,6 +104,28 @@ const FavoritesPage = () => {
       <PreviewFileModal file={previewFile} onClose={closePreview} />
 
       <FileDetailsPanel file={detailFile} onClose={closeDetail} />
+
+      <DeleteFolderModal
+        folder={folderToDelete}
+        onClose={() => setFolderToDelete(null)}
+        onConfirm={() => {
+          if (!folderToDelete) return;
+
+          moveToTrash(folderToDelete.id);
+          setFolderToDelete(null);
+        }}
+      />
+
+      <RenameFolderModal
+        folder={folderToEdit}
+        onClose={() => setFolderToEdit(null)}
+        onConfirm={(newName) => {
+          if (!folderToEdit) return;
+
+          renameFolder(folderToEdit.id, newName);
+          setFolderToEdit(null);
+        }}
+      />
 
       <DeleteFileModal
         file={fileToDelete}
