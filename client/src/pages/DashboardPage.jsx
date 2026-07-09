@@ -9,6 +9,7 @@ import DeleteFileModal from "../components/DeleteFileModal";
 import RenameFolderModal from "../components/RenameFolderModal";
 import PreviewFileModal from "../components/PreviewFileModal";
 import FileDetailsPanel from "../components/FileDetailsPanel";
+import FolderDetailsPanel from "../components/FolderDetailsPanel";
 
 import useViewStore from "../store/useViewStore";
 import useFolderStore from "../store/useFolderStore";
@@ -37,8 +38,15 @@ const DashboardPage = () => {
     moveFileToTrash,
   } = useFileStore();
 
-  const { folders, moveToTrash, renameFolder, toggleFolderFavorite } =
-    useFolderStore();
+  const {
+    folders,
+    moveToTrash,
+    renameFolder,
+    toggleFolderFavorite,
+    detailFolder,
+    setDetailFolder,
+    closeFolderDetail,
+  } = useFolderStore();
 
   const [folderToDelete, setFolderToDelete] = useState(null);
   const [folderToEdit, setFolderToEdit] = useState(null);
@@ -95,6 +103,7 @@ const DashboardPage = () => {
                 onDelete={() => setFolderToDelete(folder)}
                 onEdit={() => setFolderToEdit(folder)}
                 onFavorite={() => toggleFolderFavorite(folder.id)}
+                onDetail={() => setDetailFolder(folder)}
               />
             ))}
           </div>
@@ -161,6 +170,8 @@ const DashboardPage = () => {
           setFolderToEdit(null);
         }}
       />
+
+      <FolderDetailsPanel folder={detailFolder} onClose={closeFolderDetail} />
 
       <PreviewFileModal file={previewFile} onClose={closePreview} />
 

@@ -8,6 +8,7 @@ const FolderCard = ({
   onDelete,
   onEdit,
   onFavorite,
+  onDetail,
 }) => {
   return (
     <div
@@ -24,6 +25,7 @@ const FolderCard = ({
         onFavorite={onFavorite}
         onEdit={onEdit}
         onDelete={onDelete}
+        onDetail={onDetail}
       />
     </div>
   );

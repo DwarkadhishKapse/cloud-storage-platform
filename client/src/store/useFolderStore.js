@@ -7,20 +7,35 @@ const useFolderStore = create((set) => ({
       name: "College",
       isFavorite: false,
       isDeleted: false,
+      createdAt: Date.now(),
     },
     {
       id: 2,
       name: "Photos",
       isFavorite: false,
       isDeleted: false,
+      createdAt: Date.now(),
     },
     {
       id: 3,
       name: "Documents",
       isFavorite: false,
       isDeleted: false,
+      createdAt: Date.now(),
     },
   ],
+
+  detailFolder: null,
+
+  setDetailFolder: (folder) =>
+    set({
+      detailFolder: folder,
+    }),
+
+  closeFolderDetail: () =>
+    set({
+      detailFolder: null,
+    }),
 
   createFolder: (name) =>
     set((state) => ({
@@ -31,6 +46,7 @@ const useFolderStore = create((set) => ({
           name,
           isFavorite: false,
           isDeleted: false,
+          createdAt: Date.now(),
         },
       ],
     })),
