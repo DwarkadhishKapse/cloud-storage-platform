@@ -1,9 +1,25 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { FiX } from "react-icons/fi";
 import { formatFileSize } from "../utils/formatFileSize";
 import { formatDate } from "../utils/formatDate";
 
 const FileDetailsPanel = ({ file, onClose }) => {
+  useEffect(() => {
+    if (!file) return;
+
+    const handleKeyDown = (e) => {
+      if (e.key === "Escape") {
+        onClose();
+      }
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [file, onClose]);
+
   if (!file) return null;
 
   return (

@@ -1,7 +1,23 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { FiX, FiFileText } from "react-icons/fi";
 
 const PreviewFileModal = ({ file, onClose }) => {
+  useEffect(() => {
+    if (!file) return;
+
+    const handleKeyDown = (e) => {
+      if (e.key === "Escape") {
+        onClose();
+      }
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [file, onClose]);
+
   if (!file) return null;
 
   const isImage = file.type.startsWith("image/");

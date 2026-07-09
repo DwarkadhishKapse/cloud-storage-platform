@@ -1,9 +1,26 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { FiX } from "react-icons/fi";
 import { formatDate } from "../utils/formatDate";
 
 const FolderDetailsPanel = ({ folder, onClose }) => {
+  useEffect(() => {
+    if (!folder) return;
+
+    const handleKeyDown = (e) => {
+      if (e.key === "Escape") {
+        onClose();
+      }
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [folder, onClose]);
+
   if (!folder) return null;
+
   return (
     <div onClick={onClose} className="fixed inset-0 z-50 bg-black/30">
       <div
