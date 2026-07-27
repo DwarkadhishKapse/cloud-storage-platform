@@ -40,3 +40,19 @@ export const createFolderService = async (folderData, ownerId) => {
     folder,
   };
 };
+
+export const getFoldersService = async (ownerId) => {
+  const folders = await prisma.folder.findMany({
+    where: {
+      ownerId,
+    },
+    orderBy: {
+      createdAt: "desc",
+    },
+  });
+
+  return {
+    success: true,
+    folders,
+  };
+};
