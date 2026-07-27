@@ -23,3 +23,24 @@ export const login = asyncHandler(async (req, res) => {
       user: result.user,
     });
 });
+
+export const logout = asyncHandler(async (req, res) => {
+  res
+    .clearCookie("accessToken", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+    })
+    .status(200)
+    .json({
+      success: true,
+      message: "Logout successful.",
+    });
+});
+
+export const getCurrentUser = asyncHandler(async (req, res) => {
+  return res.status(200).json({
+    success: true,
+    user: req.user,
+  });
+});
