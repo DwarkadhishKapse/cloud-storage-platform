@@ -93,3 +93,43 @@ export const renameFolderService = async (folderId, folderData, ownerId) => {
     folder: updatedFolder,
   };
 };
+
+export const deleteFolderService = async (folderId, ownerId) => {
+  const folder = await prisma.folder.findUnique({
+    where: {
+      id: folderId,
+    },
+  });
+
+  if (!folder) {
+    throw new ApiError(404, "Folder not found.");
+  }
+
+  if (folder.ownerId !== ownerId) {
+    throw new ApiError(403, "You are not allowed to delete this folder.");
+  }
+
+  const childFolders = await prisma.folder.findFirst({
+    where: {
+      parentId: folderId,
+    },
+  });
+
+  if (childFolders) {
+    throw new ApiError(
+      400,
+      "Cannot delete a folder that contains child folders.",
+    );
+  }
+
+  await prisma.folder.delete({
+    where: {
+      id: folderId,
+    },
+  });
+
+  return {
+    success: true,
+    message: "Folder deleted successfully.",
+  };
+};
