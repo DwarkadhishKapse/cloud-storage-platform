@@ -56,3 +56,40 @@ export const getFoldersService = async (ownerId) => {
     folders,
   };
 };
+
+export const renameFolderService = async (folderId, folderData, ownerId) => {
+  const { name } = folderData;
+
+  if (!name) {
+    throw new ApiError(400, "Folder name is required");
+  }
+
+  const folder = await prisma.folder.findUnique({
+    where: {
+      id: folderId,
+    },
+  });
+
+  if (!folder) {
+    throw new ApiError(404, "Folder not found.");
+  }
+
+  if (folder.ownerId !== ownerId) {
+    throw new ApiError(403, "You are not allowed to modify this folder");
+  }
+
+  const updatedFolder = await prisma.folder.update({
+    where: {
+      id: folderId,
+    },
+    data: {
+      name,
+    },
+  });
+
+  return {
+    success: true,
+    message: "Folder renamed successfully.",
+    folder: updatedFolder,
+  };
+};

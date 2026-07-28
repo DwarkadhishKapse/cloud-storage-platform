@@ -2,6 +2,7 @@ import asyncHandler from "../utils/asyncHandler.js";
 import {
   createFolderService,
   getFoldersService,
+  renameFolderService,
 } from "../services/folder.service.js";
 
 export const createFolder = asyncHandler(async (req, res) => {
@@ -13,5 +14,15 @@ export const createFolder = asyncHandler(async (req, res) => {
 export const getFolders = asyncHandler(async (req, res) => {
   const result = await getFoldersService(req.user.id);
 
+  return res.status(200).json(result);
+});
+
+export const renameFolder = asyncHandler(async (req, res) => {
+  const result = await renameFolderService(
+    req.params.id,
+    req.body,
+    req.user.id,
+  );
+  
   return res.status(200).json(result);
 });
