@@ -4,6 +4,7 @@ import cookieParser from "cookie-parser";
 import errorHandler from "./middleware/error.middleware.js";
 import authRoutes from "./routes/auth.routes.js";
 import folderRoutes from "./routes/folder.routes.js";
+import fileRoutes from "./routes/file.routes.js";
 
 const app = express();
 
@@ -13,6 +14,7 @@ app.use(cookieParser());
 
 app.use("/api/auth", authRoutes);
 app.use("/api/folders", folderRoutes);
+app.use("/api/files", fileRoutes);
 
 app.use(errorHandler);
 
