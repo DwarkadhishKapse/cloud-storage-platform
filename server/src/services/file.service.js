@@ -1,49 +1,63 @@
 import prisma from "../lib/prisma.js";
 import ApiError from "../utils/ApiError.js";
 import cloudinary from "../config/cloudinary.js";
-import { Readable } from "stream";
 
 export const uploadFileService = async (file, body, ownerId) => {
   if (!file) {
-    throw new ApiError(400, "Please upload a file.");
+    throw new ApiError(400, "No file was uploaded");
   }
 
-  if (body.folderId) {
+  const folderId = body.folderId || null;
+
+  if (folderId) {
     const folder = await prisma.folder.findUnique({
       where: {
-        id: body.folderId,
+        id: folderId,
       },
     });
 
     if (!folder) {
-      throw new ApiError(404, "Folder not found.");
+      throw new ApiError(404, "The specified folder does not exist");
     }
 
     if (folder.ownerId !== ownerId) {
       throw new ApiError(
         403,
-        "You are not allowed to upload files to this folder.",
+        "You do not have permission to upload files to this folder",
       );
     }
   }
 
-  const uploadResult = await new Promise((resolve, reject) => {
-    const uploadStream = cloudinary.uploader.upload_stream(
-      {
-        folder: "cloud-storage-platform",
-        resource_type: "auto",
-      },
-      (error, result) => {
-        if (error) {
-          return reject(error);
-        }
+  let uploadResult;
 
-        resolve(result);
-      },
+  try {
+    uploadResult = await new Promise((resolve, reject) => {
+      const uploadStream = cloudinary.uploader.upload_stream(
+        {
+          folder: "cloud-storage-platform",
+          resource_type: "auto",
+        },
+        (error, result) => {
+          if (error) {
+            return reject(error);
+          }
+
+          resolve(result);
+        },
+      );
+
+      uploadStream.end(file.buffer);
+    });
+  } catch (error) {
+    throw new ApiError(
+      error.http_code || 500,
+      error.message || "Unable to upload the file",
     );
+  }
 
-    Readable.from(file.buffer).pipe(uploadStream);
-  });
+  if (!uploadResult) {
+    throw new ApiError(500, "File upload failed");
+  }
 
   const uploadedFile = await prisma.file.create({
     data: {
@@ -53,13 +67,36 @@ export const uploadFileService = async (file, body, ownerId) => {
       mimeType: file.mimetype,
       size: BigInt(file.size),
       ownerId,
-      folderId: body.folderId || null,
+      folderId,
     },
   });
 
   return {
     success: true,
-    message: "File uploaded successfully.",
-    file: uploadedFile,
+    message: "File uploaded successfully",
+    file: {
+      ...uploadedFile,
+      size: Number(uploadedFile.size),
+    },
+  };
+};
+
+export const getFilesService = async (ownerId) => {
+  const files = await prisma.file.findMany({
+    where: {
+      ownerId,
+      isTrashed: false,
+    },
+    orderBy: {
+      createdAt: "desc",
+    },
+  });
+
+  return {
+    success: true,
+    files: files.map((file) => ({
+      ...file,
+      size: Number(file.size),
+    })),
   };
 };
