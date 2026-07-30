@@ -1,37 +1,12 @@
 import { create } from "zustand";
 
 const useFileStore = create((set) => ({
-  files: [
-    {
-      id: 1,
-      name: "Resume.pdf",
-      size: 2411724,
-      type: "application/pdf",
-      isFavorite: false,
-      isDeleted: false,
-      createdAt: Date.now(),
-    },
+  files: [],
 
-    {
-      id: 2,
-      name: "DBMS Notes.pdf",
-      size: 6081740,
-      type: "application/pdf",
-      isFavorite: false,
-      isDeleted: false,
-      createdAt: Date.now(),
-    },
-
-    {
-      id: 3,
-      name: "Goa.jpg",
-      size: 1258291,
-      type: "image/jpeg",
-      isFavorite: false,
-      isDeleted: false,
-      createdAt: Date.now(),
-    },
-  ],
+  setFiles: (files) =>
+    set({
+      files,
+    }),
 
   previewFile: null,
 
@@ -64,7 +39,7 @@ const useFileStore = create((set) => ({
         {
           id: Date.now(),
           isFavorite: false,
-          isDeleted: false,
+          isTrashed: false,
           createdAt: Date.now(),
           ...fileObject,
         },
@@ -82,7 +57,7 @@ const useFileStore = create((set) => ({
   moveFileToTrash: (id) => {
     set((state) => ({
       files: state.files.map((file) =>
-        file.id === id ? { ...file, isDeleted: true } : file,
+        file.id === id ? { ...file, isTrashed: true } : file,
       ),
     }));
   },

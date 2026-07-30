@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 import FolderCard from "../components/FolderCard";
@@ -10,6 +10,7 @@ import RenameFolderModal from "../components/RenameFolderModal";
 import PreviewFileModal from "../components/PreviewFileModal";
 import FileDetailsPanel from "../components/FileDetailsPanel";
 import FolderDetailsPanel from "../components/FolderDetailsPanel";
+import { getFiles } from "../services/file.service";
 
 import useViewStore from "../store/useViewStore";
 import useFolderStore from "../store/useFolderStore";
@@ -26,8 +27,14 @@ const DashboardPage = () => {
   const { view } = useViewStore();
   const { searchQuery } = useSearchStore();
 
+  const [folderToDelete, setFolderToDelete] = useState(null);
+  const [folderToEdit, setFolderToEdit] = useState(null);
+  const [fileToDelete, setFileToDelete] = useState(null);
+  const [loadingFiles, setLoadingFiles] = useState(true);
+
   const {
     files,
+    setFiles,
     previewFile,
     setPreviewFile,
     closePreview,
@@ -37,6 +44,21 @@ const DashboardPage = () => {
     toggleFileFavorite,
     moveFileToTrash,
   } = useFileStore();
+
+  useEffect(() => {
+    const fetchFiles = async () => {
+      try {
+        const response = await getFiles();
+        setFiles(response.files);
+      } catch (error) {
+        console.error("Failed to fetch files:", error);
+      } finally {
+        setLoadingFiles(false);
+      }
+    };
+
+    fetchFiles();
+  }, [setFiles]);
 
   const {
     folders,
@@ -48,14 +70,10 @@ const DashboardPage = () => {
     closeFolderDetail,
   } = useFolderStore();
 
-  const [folderToDelete, setFolderToDelete] = useState(null);
-  const [folderToEdit, setFolderToEdit] = useState(null);
-  const [fileToDelete, setFileToDelete] = useState(null);
-
   const normalizedQuery = searchQuery.toLowerCase().trim();
 
   const activeFolders = folders.filter((folder) => !folder.isDeleted);
-  const activeFiles = files.filter((file) => !file.isDeleted);
+  const activeFiles = files.filter((file) => !file.isTrashed);
 
   const filteredFolders = activeFolders.filter((folder) =>
     folder.name.toLowerCase().includes(normalizedQuery),
@@ -81,6 +99,10 @@ const DashboardPage = () => {
 
           <p className="mt-3 text-slate-500">Try another search term.</p>
         </div>
+      )}
+
+      {loadingFiles && (
+        <div className="mt-10 text-center text-slate-500">Loading files...</div>
       )}
 
       {filteredFolders.length > 0 && (
