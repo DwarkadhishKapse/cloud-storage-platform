@@ -100,3 +100,33 @@ export const getFilesService = async (ownerId) => {
     })),
   };
 };
+
+export const moveFileToTrashService = async (fileId, ownerId) => {
+  const file = await prisma.file.findUnique({
+    where: {
+      id: fileId,
+    },
+  });
+
+  if (!file) {
+    throw new ApiError(404, "File not found");
+  }
+
+  if (file.ownerId !== ownerId) {
+    throw new ApiError(403, "You do not have permission to modify this file");
+  }
+
+  await prisma.file.update({
+    where: {
+      id: fileId,
+    },
+    data: {
+      isTrashed: true,
+    },
+  });
+
+  return {
+    success: true,
+    message: "File moved to trash successfully",
+  };
+};

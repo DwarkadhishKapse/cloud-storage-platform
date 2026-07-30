@@ -32,21 +32,6 @@ const useFileStore = create((set) => ({
       detailFile: null,
     }),
 
-  addFile: (fileObject) => {
-    set((state) => ({
-      files: [
-        ...state.files,
-        {
-          id: Date.now(),
-          isFavorite: false,
-          isTrashed: false,
-          createdAt: Date.now(),
-          ...fileObject,
-        },
-      ],
-    }));
-  },
-
   toggleFileFavorite: (id) =>
     set((state) => ({
       files: state.files.map((file) =>
@@ -54,27 +39,24 @@ const useFileStore = create((set) => ({
       ),
     })),
 
-  moveFileToTrash: (id) => {
+  moveFileToTrash: (id) =>
     set((state) => ({
       files: state.files.map((file) =>
         file.id === id ? { ...file, isTrashed: true } : file,
       ),
-    }));
-  },
+    })),
 
-  restoreFile: (id) => {
+  restoreFile: (id) =>
     set((state) => ({
       files: state.files.map((file) =>
-        file.id === id ? { ...file, isDeleted: false } : file,
+        file.id === id ? { ...file, isTrashed: false } : file,
       ),
-    }));
-  },
+    })),
 
-  permanentlyDeleteFile: (id) => {
+  permanentlyDeleteFile: (id) =>
     set((state) => ({
       files: state.files.filter((file) => file.id !== id),
-    }));
-  },
+    })),
 }));
 
 export default useFileStore;
