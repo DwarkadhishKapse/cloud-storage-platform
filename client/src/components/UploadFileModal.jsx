@@ -1,12 +1,10 @@
 import React, { useRef, useState } from "react";
-import useFileStore from "../store/useFileStore";
 import { formatFileSize } from "../utils/formatFileSize";
+import { uploadFile } from "../services/file.service";
 
 const UploadFileModal = ({ isOpen, onClose }) => {
   const [selectedFile, setSelectedFile] = useState(null);
   const fileInputRef = useRef(null);
-
-  const { addFile } = useFileStore();
 
   if (!isOpen) return null;
 
@@ -17,28 +15,27 @@ const UploadFileModal = ({ isOpen, onClose }) => {
     }
   };
 
-  const handleUpload = () => {
+  const handleUpload = async () => {
     if (!selectedFile) {
       alert("Please select a file");
       return;
     }
 
-    const previewUrl = URL.createObjectURL(selectedFile);
+    try {
+      const formData = new FormData();
+      formData.append("file", selectedFile);
+      await uploadFile(formData);
 
-    addFile({
-      name: selectedFile.name,
-      size: selectedFile.size,
-      type: selectedFile.type,
-      previewUrl,
-    });
+      setSelectedFile(null);
 
-    setSelectedFile(null);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
 
-    if (fileInputRef.current) {
-      fileInputRef.current.value = "";
+      onClose();
+    } catch (error) {
+      console.error("Failed to upload file:", error);
     }
-
-    onClose();
   };
 
   const handleCancel = () => {
