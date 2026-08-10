@@ -1,10 +1,8 @@
 import React from "react";
-import FavoritesPage from "./pages/FavoritesPage";
+import AppRoutes from "./routes/AppRoutes";
 
 const App = () => {
-  return (
-    <h1 className="text-4xl font-bold text-blue-500">Cloud Storage Platform</h1>
-  );
+  return <AppRoutes />;
 };
 
 export default App;
