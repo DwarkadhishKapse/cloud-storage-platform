@@ -10,7 +10,7 @@ import RenameFolderModal from "../components/RenameFolderModal";
 import PreviewFileModal from "../components/PreviewFileModal";
 import FileDetailsPanel from "../components/FileDetailsPanel";
 import FolderDetailsPanel from "../components/FolderDetailsPanel";
-import { getFiles } from "../services/file.service";
+import { getFiles, moveFileToTrash } from "../services/file.service";
 
 import useViewStore from "../store/useViewStore";
 import useFolderStore from "../store/useFolderStore";
@@ -42,7 +42,7 @@ const DashboardPage = () => {
     detailFile,
     closeDetail,
     toggleFileFavorite,
-    moveFileToTrash,
+    moveFileToTrash: moveFileToTrashLocal,
   } = useFileStore();
 
   useEffect(() => {
@@ -84,6 +84,18 @@ const DashboardPage = () => {
   );
 
   const hasResults = filteredFolders.length > 0 || filteredFiles.length > 0;
+
+  const handleMoveFileToTrash = async () => {
+    if (!fileToDelete) return;
+
+    try {
+      await moveFileToTrash(fileToDelete.id);
+      moveFileToTrashLocal(fileToDelete.id);
+      setFileToDelete(null);
+    } catch (error) {
+      console.error("Failed to move file to trash:", error);
+    }
+  };
 
   return (
     <div>

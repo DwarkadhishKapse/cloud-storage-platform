@@ -11,3 +11,9 @@ export const uploadFile = async (formData) => {
 
   return response.data;
 };
+
+export const moveFileToTrash = async (fileId) => {
+  const response = await api.patch(`files/${fileId}/trash`);
+
+  return response.data;
+};
