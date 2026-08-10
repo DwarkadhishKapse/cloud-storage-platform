@@ -8,6 +8,11 @@ const useFileStore = create((set) => ({
       files,
     }),
 
+  addFile: (file) =>
+    set((state) => ({
+      files: [...state.files, file],
+    })),
+
   previewFile: null,
 
   detailFile: null,

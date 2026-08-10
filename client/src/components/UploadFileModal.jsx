@@ -1,4 +1,5 @@
 import React, { useRef, useState } from "react";
+import useFileStore from "../store/useFileStore";
 import { formatFileSize } from "../utils/formatFileSize";
 import { uploadFile } from "../services/file.service";
 
@@ -6,10 +7,13 @@ const UploadFileModal = ({ isOpen, onClose }) => {
   const [selectedFile, setSelectedFile] = useState(null);
   const fileInputRef = useRef(null);
 
+  const { addFile } = useFileStore();
+
   if (!isOpen) return null;
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
+
     if (file) {
       setSelectedFile(file);
     }
@@ -24,7 +28,10 @@ const UploadFileModal = ({ isOpen, onClose }) => {
     try {
       const formData = new FormData();
       formData.append("file", selectedFile);
-      await uploadFile(formData);
+
+      const response = await uploadFile(formData);
+
+      addFile(response.file);
 
       setSelectedFile(null);
 
@@ -40,16 +47,20 @@ const UploadFileModal = ({ isOpen, onClose }) => {
 
   const handleCancel = () => {
     setSelectedFile(null);
+
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
     }
+
     onClose();
   };
 
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black/30">
       <div className="w-full max-w-md rounded-3xl bg-white p-6 shadow-xl">
-        <h2 className="mb-6 text-2xl font-bold text-slate-900">Upload File</h2>
+        <h2 className="mb-6 text-2xl font-bold text-slate-900">
+          Upload File
+        </h2>
 
         <input
           ref={fileInputRef}
@@ -68,9 +79,11 @@ const UploadFileModal = ({ isOpen, onClose }) => {
         {selectedFile && (
           <div className="mb-6 rounded-lg border bg-slate-50 p-4">
             <p className="font-medium">{selectedFile.name}</p>
+
             <p className="text-sm text-slate-500">
               {formatFileSize(selectedFile.size)}
             </p>
+
             <p className="text-sm text-slate-500">
               {selectedFile.type || "Unknown file type"}
             </p>

@@ -20,14 +20,16 @@ const PreviewFileModal = ({ file, onClose }) => {
 
   if (!file) return null;
 
-  const isImage = file.type.startsWith("image/");
-  const isPdf = file.type === "application/pdf";
+  const isImage = file.mimeType?.startsWith("image/");
+  const isPdf = file.mimeType === "application/pdf";
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-6">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-6">
       <div className="flex h-[90vh] w-full max-w-6xl flex-col overflow-hidden rounded-3xl bg-white shadow-2xl">
-        <div className="flex items-center justify-between border-b border-slate-200 p-5">
-          <h2 className="text-xl font-semibold text-slate-900">{file.name}</h2>
+        <div className="flex items-center justify-between border-b border-slate-200 px-6 py-4">
+          <h2 className="truncate pr-4 text-lg font-semibold text-slate-900">
+            {file.name}
+          </h2>
 
           <button
             onClick={onClose}
@@ -40,15 +42,15 @@ const PreviewFileModal = ({ file, onClose }) => {
         <div className="flex flex-1 items-center justify-center overflow-auto bg-slate-50 p-6">
           {isImage && (
             <img
-              src={file.previewUrl}
+              src={file.url}
               alt={file.name}
-              className="max-h-full max-w-full rounded-2xl shadow-lg"
+              className="max-h-full max-w-full rounded-2xl object-contain shadow-lg"
             />
           )}
 
           {isPdf && (
             <iframe
-              src={file.previewUrl}
+              src={file.url}
               title={file.name}
               className="h-full w-full rounded-2xl border"
             />
@@ -56,7 +58,10 @@ const PreviewFileModal = ({ file, onClose }) => {
 
           {!isImage && !isPdf && (
             <div className="text-center">
-              <FiFileText size={72} className="mx-auto text-slate-400" />
+              <FiFileText
+                size={72}
+                className="mx-auto text-slate-400"
+              />
 
               <h3 className="mt-6 text-2xl font-semibold text-slate-800">
                 {file.name}
