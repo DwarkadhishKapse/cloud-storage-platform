@@ -12,12 +12,18 @@ import FileDetailsPanel from "../components/FileDetailsPanel";
 import { formatFileSize } from "../utils/formatFileSize";
 import { downloadFile } from "../utils/downloadFile";
 import { getFiles } from "../services/file.service";
+import { getFolders } from "../services/folder.service";
 
 const FavoritesPage = () => {
   const navigate = useNavigate();
 
-  const { folders, toggleFolderFavorite, renameFolder, moveToTrash } =
-    useFolderStore();
+  const {
+    folders,
+    setFolders,
+    toggleFolderFavorite,
+    renameFolder,
+    moveToTrash,
+  } = useFolderStore();
 
   const {
     files,
@@ -38,30 +44,32 @@ const FavoritesPage = () => {
   const [loadingFiles, setLoadingFiles] = useState(true);
 
   useEffect(() => {
-    const fetchFiles = async () => {
+    const fetchFavoritesData = async () => {
       try {
-        const response = await getFiles();
-        setFiles(response.files);
+        const [filesResponse, foldersResponse] = await Promise.all([
+          getFiles(),
+          getFolders(),
+        ]);
+
+        setFiles(filesResponse.files);
+        setFolders(foldersResponse.folders);
       } catch (error) {
-        console.error("Failed to fetch files:", error);
+        console.error("Failed to fetch favorites:", error);
       } finally {
         setLoadingFiles(false);
       }
     };
 
-    fetchFiles();
-  }, [setFiles]);
+    fetchFavoritesData();
+  }, [setFiles, setFolders]);
 
   const activeFolders = folders.filter((folder) => !folder.isDeleted);
-  const favoriteFolders = activeFolders.filter(
-    (folder) => folder.isFavorite,
-  );
+  const favoriteFolders = activeFolders.filter((folder) => folder.isFavorite);
 
   const activeFiles = files.filter((file) => !file.isTrashed);
   const favoriteFiles = activeFiles.filter((file) => file.isFavorite);
 
-  const hasFavorites =
-    favoriteFolders.length > 0 || favoriteFiles.length > 0;
+  const hasFavorites = favoriteFolders.length > 0 || favoriteFiles.length > 0;
 
   if (loadingFiles) {
     return (
@@ -91,9 +99,7 @@ const FavoritesPage = () => {
 
       {favoriteFolders.length > 0 && (
         <div>
-          <h2 className="mb-5 text-2xl font-bold text-slate-900">
-            Folders
-          </h2>
+          <h2 className="mb-5 text-2xl font-bold text-slate-900">Folders</h2>
 
           <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
             {favoriteFolders.map((folder) => (
@@ -117,9 +123,7 @@ const FavoritesPage = () => {
 
       {favoriteFiles.length > 0 && (
         <div className="mt-10">
-          <h2 className="mb-5 text-2xl font-bold text-slate-900">
-            Files
-          </h2>
+          <h2 className="mb-5 text-2xl font-bold text-slate-900">Files</h2>
 
           <div className="space-y-4">
             {favoriteFiles.map((file) => (
@@ -139,15 +143,9 @@ const FavoritesPage = () => {
         </div>
       )}
 
-      <PreviewFileModal
-        file={previewFile}
-        onClose={closePreview}
-      />
+      <PreviewFileModal file={previewFile} onClose={closePreview} />
 
-      <FileDetailsPanel
-        file={detailFile}
-        onClose={closeDetail}
-      />
+      <FileDetailsPanel file={detailFile} onClose={closeDetail} />
 
       <DeleteFolderModal
         folder={folderToDelete}

@@ -25,3 +25,9 @@ export const deleteFolder = async (folderId) => {
 
   return response.data;
 };
+
+export const toggleFolderFavorite = async (folderId) => {
+  const response = await api.patch(`/folders/${folderId}/favorite`);
+
+  return response.data;
+};

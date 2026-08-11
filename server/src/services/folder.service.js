@@ -133,3 +133,39 @@ export const deleteFolderService = async (folderId, ownerId) => {
     message: "Folder deleted successfully.",
   };
 };
+
+export const toggleFolderFavoriteService = async (folderId, ownerId) => {
+  const folder = await prisma.folder.findUnique({
+    where: {
+      id: folderId,
+    },
+  });
+
+  if (!folder) {
+    throw new ApiError(404, "Folder not found.");
+  }
+
+  if (folder.ownerId !== ownerId) {
+    throw new ApiError(
+      403,
+      "You do not have permission to modify this folder.",
+    );
+  }
+
+  const updatedFolder = await prisma.folder.update({
+    where: {
+      id: folderId,
+    },
+    data: {
+      isFavorite: !folder.isFavorite,
+    },
+  });
+
+  return {
+    success: true,
+    message: updatedFolder.isFavorite
+      ? "Folder added to favorites."
+      : "Folder removed from favorites.",
+    folder: updatedFolder,
+  };
+};

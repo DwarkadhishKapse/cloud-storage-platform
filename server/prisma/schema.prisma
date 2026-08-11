@@ -35,9 +35,13 @@ model Folder {
   ownerId String @db.Uuid
   owner   User   @relation(fields: [ownerId], references: [id], onDelete: Cascade)
 
+  isFavorite Boolean @default(false)
+  isTrashed  Boolean @default(false)
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  files     File[]
+
+  files File[]
 
   @@index([ownerId])
 }

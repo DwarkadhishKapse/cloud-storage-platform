@@ -5,6 +5,7 @@ import {
   getFolders,
   renameFolder,
   deleteFolder,
+  toggleFolderFavorite,
 } from "../controllers/folder.controller.js";
 
 const router = Router();
@@ -12,6 +13,7 @@ const router = Router();
 router.post("/", protect, createFolder);
 router.get("/", protect, getFolders);
 router.patch("/:id", protect, renameFolder);
+router.patch("/:id/favorite", protect, toggleFolderFavorite);
 router.delete("/:id", protect, deleteFolder);
 
 export default router;

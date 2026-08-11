@@ -4,6 +4,7 @@ import {
   getFoldersService,
   renameFolderService,
   deleteFolderService,
+  toggleFolderFavoriteService,
 } from "../services/folder.service.js";
 
 export const createFolder = asyncHandler(async (req, res) => {
@@ -30,6 +31,12 @@ export const renameFolder = asyncHandler(async (req, res) => {
 
 export const deleteFolder = asyncHandler(async (req, res) => {
   const result = await deleteFolderService(req.params.id, req.user.id);
+
+  return res.status(200).json(result);
+});
+
+export const toggleFolderFavorite = asyncHandler(async (req, res) => {
+  const result = await toggleFolderFavoriteService(req.params.id, req.user.id);
 
   return res.status(200).json(result);
 });

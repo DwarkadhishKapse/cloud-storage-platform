@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import { toggleFolderFavorite } from "../services/folder.service";
 
 const useFolderStore = create((set) => ({
   folders: [],
@@ -51,17 +52,19 @@ const useFolderStore = create((set) => ({
       ),
     })),
 
-  toggleFolderFavorite: (id) =>
-    set((state) => ({
-      folders: state.folders.map((folder) =>
-        folder.id === id
-          ? {
-              ...folder,
-              isFavorite: !folder.isFavorite,
-            }
-          : folder,
-      ),
-    })),
+  toggleFolderFavorite: async (id) => {
+    try {
+      const response = await toggleFolderFavorite(id);
+
+      set((state) => ({
+        folders: state.folders.map((folder) =>
+          folder.id === id ? response.folder : folder,
+        ),
+      }));
+    } catch (error) {
+      console.error("Failed to toggle folder favorite:", error);
+    }
+  },
 }));
 
 export default useFolderStore;
