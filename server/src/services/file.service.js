@@ -240,6 +240,10 @@ export const permanentlyDeleteFileService = async (fileId, ownerId) => {
     throw new ApiError(403, "You do not have permission to delete this file");
   }
 
+  if (!file.isTrashed) {
+    throw new ApiError(400, "File is not in trash");
+  }
+
   try {
     let resourceType = "raw";
 

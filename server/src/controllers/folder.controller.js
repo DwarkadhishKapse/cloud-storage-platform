@@ -1,9 +1,13 @@
 import asyncHandler from "../utils/asyncHandler.js";
+
 import {
   createFolderService,
   getFoldersService,
+  getTrashedFoldersService,
   renameFolderService,
-  deleteFolderService,
+  moveFolderToTrashService,
+  restoreFolderService,
+  permanentlyDeleteFolderService,
   toggleFolderFavoriteService,
 } from "../services/folder.service.js";
 
@@ -19,6 +23,12 @@ export const getFolders = asyncHandler(async (req, res) => {
   return res.status(200).json(result);
 });
 
+export const getTrashedFolders = asyncHandler(async (req, res) => {
+  const result = await getTrashedFoldersService(req.user.id);
+
+  return res.status(200).json(result);
+});
+
 export const renameFolder = asyncHandler(async (req, res) => {
   const result = await renameFolderService(
     req.params.id,
@@ -29,8 +39,23 @@ export const renameFolder = asyncHandler(async (req, res) => {
   return res.status(200).json(result);
 });
 
-export const deleteFolder = asyncHandler(async (req, res) => {
-  const result = await deleteFolderService(req.params.id, req.user.id);
+export const moveFolderToTrash = asyncHandler(async (req, res) => {
+  const result = await moveFolderToTrashService(req.params.id, req.user.id);
+
+  return res.status(200).json(result);
+});
+
+export const restoreFolder = asyncHandler(async (req, res) => {
+  const result = await restoreFolderService(req.params.id, req.user.id);
+
+  return res.status(200).json(result);
+});
+
+export const permanentlyDeleteFolder = asyncHandler(async (req, res) => {
+  const result = await permanentlyDeleteFolderService(
+    req.params.id,
+    req.user.id,
+  );
 
   return res.status(200).json(result);
 });

@@ -74,7 +74,7 @@ const DashboardPage = () => {
 
   const normalizedQuery = searchQuery.toLowerCase().trim();
 
-  const activeFolders = folders.filter((folder) => !folder.isDeleted);
+  const activeFolders = folders.filter((folder) => !folder.isTrashed);
   const activeFiles = files.filter((file) => !file.isTrashed);
 
   const filteredFolders = activeFolders.filter((folder) =>
@@ -190,10 +190,10 @@ const DashboardPage = () => {
       <DeleteFolderModal
         folder={folderToDelete}
         onClose={() => setFolderToDelete(null)}
-        onConfirm={() => {
+        onConfirm={async () => {
           if (!folderToDelete) return;
 
-          moveToTrash(folderToDelete.id);
+          await moveToTrash(folderToDelete.id);
           setFolderToDelete(null);
         }}
       />

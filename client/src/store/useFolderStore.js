@@ -1,5 +1,11 @@
 import { create } from "zustand";
-import { toggleFolderFavorite } from "../services/folder.service";
+
+import {
+  toggleFolderFavorite,
+  moveFolderToTrash,
+  restoreFolder,
+  permanentlyDeleteFolder,
+} from "../services/folder.service";
 
 const useFolderStore = create((set) => ({
   folders: [],
@@ -26,24 +32,49 @@ const useFolderStore = create((set) => ({
       detailFolder: null,
     }),
 
-  moveToTrash: (id) =>
-    set((state) => ({
-      folders: state.folders.map((folder) =>
-        folder.id === id ? { ...folder, isDeleted: true } : folder,
-      ),
-    })),
+  moveToTrash: async (id) => {
+    try {
+      const response = await moveFolderToTrash(id);
 
-  restoreFolder: (id) =>
-    set((state) => ({
-      folders: state.folders.map((folder) =>
-        folder.id === id ? { ...folder, isDeleted: false } : folder,
-      ),
-    })),
+      set((state) => ({
+        folders: state.folders.map((folder) =>
+          folder.id === id ? response.folder : folder,
+        ),
+      }));
+    } catch (error) {
+      console.error("Failed to move folder to trash:", error);
+      throw error;
+    }
+  },
 
-  permanentlyDeleteFolder: (id) =>
-    set((state) => ({
-      folders: state.folders.filter((folder) => folder.id !== id),
-    })),
+  restoreFolder: async (id) => {
+    try {
+      const response = await restoreFolder(id);
+
+      set((state) => ({
+        folders: state.folders.map((folder) =>
+          folder.id === id ? response.folder : folder,
+        ),
+      }));
+    } catch (error) {
+      console.error("Failed to restore folder:", error);
+      throw error;
+    }
+  },
+
+  permanentlyDeleteFolder: async (id) => {
+    try {
+      await permanentlyDeleteFolder(id);
+
+      set((state) => ({
+        folders: state.folders.filter((folder) => folder.id !== id),
+      }));
+    } catch (error) {
+      console.error("Failed to permanently delete folder:", error);
+
+      throw error;
+    }
+  },
 
   renameFolderLocal: (id, newName) =>
     set((state) => ({
@@ -63,6 +94,8 @@ const useFolderStore = create((set) => ({
       }));
     } catch (error) {
       console.error("Failed to toggle folder favorite:", error);
+
+      throw error;
     }
   },
 }));

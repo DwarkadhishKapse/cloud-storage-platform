@@ -31,3 +31,27 @@ export const toggleFolderFavorite = async (folderId) => {
 
   return response.data;
 };
+
+export const moveFolderToTrash = async (folderId) => {
+  const response = await api.patch(`/folders/${folderId}/trash`);
+
+  return response.data;
+};
+
+export const getTrashedFolders = async () => {
+  const response = await api.get("/folders/trash");
+
+  return response.data;
+};
+
+export const restoreFolder = async (folderId) => {
+  const response = await api.patch(`/folders/${folderId}/restore`);
+
+  return response.data;
+};
+
+export const permanentlyDeleteFolder = async (folderId) => {
+  const response = await api.delete(`/folders/${folderId}/permanent`);
+
+  return response.data;
+};

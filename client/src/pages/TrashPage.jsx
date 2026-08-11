@@ -17,8 +17,11 @@ import {
   permanentlyDeleteFile as permanentlyDeleteFileApi,
 } from "../services/file.service";
 
+import { getTrashedFolders } from "../services/folder.service";
+
 const TrashPage = () => {
-  const { folders, restoreFolder, permanentlyDeleteFolder } = useFolderStore();
+  const { folders, setFolders, restoreFolder, permanentlyDeleteFolder } =
+    useFolderStore();
 
   const { files, setFiles, restoreFile, permanentlyDeleteFile } =
     useFileStore();
@@ -28,26 +31,32 @@ const TrashPage = () => {
 
   const [loading, setLoading] = useState(true);
 
+  // Fetch trashed folders and files
   useEffect(() => {
-    const fetchTrashedFiles = async () => {
+    const fetchTrash = async () => {
       try {
-        const response = await getTrashedFiles();
+        const [folderResponse, fileResponse] = await Promise.all([
+          getTrashedFolders(),
+          getTrashedFiles(),
+        ]);
 
-        setFiles(response.files);
+        setFolders(folderResponse.folders);
+        setFiles(fileResponse.files);
       } catch (error) {
-        console.error("Failed to fetch trashed files:", error);
+        console.error("Failed to fetch trash:", error);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchTrashedFiles();
-  }, [setFiles]);
+    fetchTrash();
+  }, [setFolders, setFiles]);
 
-  const trashFolders = folders.filter((folder) => folder.isDeleted);
+  const trashFolders = folders.filter((folder) => folder.isTrashed);
 
   const trashFiles = files.filter((file) => file.isTrashed);
 
+  // Restore file
   const handleRestoreFile = async (file) => {
     try {
       await restoreFileApi(file.id);
@@ -58,6 +67,16 @@ const TrashPage = () => {
     }
   };
 
+  // Restore folder
+  const handleRestoreFolder = async (folder) => {
+    try {
+      await restoreFolder(folder.id);
+    } catch (error) {
+      console.error("Failed to restore folder:", error);
+    }
+  };
+
+  // Permanently delete file
   const handlePermanentlyDeleteFile = async () => {
     if (!fileToDelete) return;
 
@@ -69,6 +88,19 @@ const TrashPage = () => {
       setFileToDelete(null);
     } catch (error) {
       console.error("Failed to permanently delete file:", error);
+    }
+  };
+
+  // Permanently delete folder
+  const handlePermanentlyDeleteFolder = async () => {
+    if (!folderToDelete) return;
+
+    try {
+      await permanentlyDeleteFolder(folderToDelete.id);
+
+      setFolderToDelete(null);
+    } catch (error) {
+      console.error("Failed to permanently delete folder:", error);
     }
   };
 
@@ -100,6 +132,7 @@ const TrashPage = () => {
     <div>
       <h1 className="mb-8 text-4xl font-bold text-slate-900">Trash</h1>
 
+      {/* Folders */}
       {trashFolders.length > 0 && (
         <div>
           <h2 className="mb-5 text-2xl font-bold text-slate-900">Folders</h2>
@@ -109,7 +142,7 @@ const TrashPage = () => {
               <TrashFolderCard
                 key={folder.id}
                 name={folder.name}
-                onRestore={() => restoreFolder(folder.id)}
+                onRestore={() => handleRestoreFolder(folder)}
                 onDeleteForever={() => setFolderToDelete(folder)}
               />
             ))}
@@ -117,6 +150,7 @@ const TrashPage = () => {
         </div>
       )}
 
+      {/* Files */}
       {trashFiles.length > 0 && (
         <div className="mt-10">
           <h2 className="mb-5 text-2xl font-bold text-slate-900">Files</h2>
@@ -135,17 +169,14 @@ const TrashPage = () => {
         </div>
       )}
 
+      {/* Delete Forever Folder Modal */}
       <DeleteForeverFolderModal
         folder={folderToDelete}
         onClose={() => setFolderToDelete(null)}
-        onConfirm={() => {
-          if (!folderToDelete) return;
-
-          permanentlyDeleteFolder(folderToDelete.id);
-          setFolderToDelete(null);
-        }}
+        onConfirm={handlePermanentlyDeleteFolder}
       />
 
+      {/* Delete Forever File Modal */}
       <DeleteForeverFileModal
         file={fileToDelete}
         onClose={() => setFileToDelete(null)}
