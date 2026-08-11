@@ -1,29 +1,17 @@
 import { create } from "zustand";
 
 const useFolderStore = create((set) => ({
-  folders: [
-    {
-      id: 1,
-      name: "College",
-      isFavorite: false,
-      isDeleted: false,
-      createdAt: Date.now(),
-    },
-    {
-      id: 2,
-      name: "Photos",
-      isFavorite: false,
-      isDeleted: false,
-      createdAt: Date.now(),
-    },
-    {
-      id: 3,
-      name: "Documents",
-      isFavorite: false,
-      isDeleted: false,
-      createdAt: Date.now(),
-    },
-  ],
+  folders: [],
+
+  setFolders: (folders) =>
+    set({
+      folders,
+    }),
+
+  addFolder: (folder) =>
+    set((state) => ({
+      folders: [folder, ...state.folders],
+    })),
 
   detailFolder: null,
 
@@ -36,20 +24,6 @@ const useFolderStore = create((set) => ({
     set({
       detailFolder: null,
     }),
-
-  createFolder: (name) =>
-    set((state) => ({
-      folders: [
-        ...state.folders,
-        {
-          id: Date.now(),
-          name,
-          isFavorite: false,
-          isDeleted: false,
-          createdAt: Date.now(),
-        },
-      ],
-    })),
 
   moveToTrash: (id) =>
     set((state) => ({
@@ -70,7 +44,7 @@ const useFolderStore = create((set) => ({
       folders: state.folders.filter((folder) => folder.id !== id),
     })),
 
-  renameFolder: (id, newName) =>
+  renameFolderLocal: (id, newName) =>
     set((state) => ({
       folders: state.folders.map((folder) =>
         folder.id === id ? { ...folder, name: newName } : folder,
@@ -81,7 +55,10 @@ const useFolderStore = create((set) => ({
     set((state) => ({
       folders: state.folders.map((folder) =>
         folder.id === id
-          ? { ...folder, isFavorite: !folder.isFavorite }
+          ? {
+              ...folder,
+              isFavorite: !folder.isFavorite,
+            }
           : folder,
       ),
     })),

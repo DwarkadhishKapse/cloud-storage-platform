@@ -11,6 +11,7 @@ import PreviewFileModal from "../components/PreviewFileModal";
 import FileDetailsPanel from "../components/FileDetailsPanel";
 import FolderDetailsPanel from "../components/FolderDetailsPanel";
 import { getFiles, moveFileToTrash } from "../services/file.service";
+import { getFolders } from "../services/folder.service";
 
 import useViewStore from "../store/useViewStore";
 import useFolderStore from "../store/useFolderStore";
@@ -62,6 +63,7 @@ const DashboardPage = () => {
 
   const {
     folders,
+    setFolders,
     moveToTrash,
     renameFolder,
     toggleFolderFavorite,
@@ -82,6 +84,19 @@ const DashboardPage = () => {
   const filteredFiles = activeFiles.filter((file) =>
     file.name.toLowerCase().includes(normalizedQuery),
   );
+
+  useEffect(() => {
+    const fetchFolders = async () => {
+      try {
+        const response = await getFolders();
+        setFolders(response.folders);
+      } catch (error) {
+        console.error("Failed to fetch folders:", error);
+      }
+    };
+
+    fetchFolders();
+  }, [setFolders]);
 
   const hasResults = filteredFolders.length > 0 || filteredFiles.length > 0;
 
