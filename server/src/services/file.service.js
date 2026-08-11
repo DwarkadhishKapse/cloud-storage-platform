@@ -166,3 +166,104 @@ export const toggleFileFavoriteService = async (fileId, ownerId) => {
     },
   };
 };
+
+export const getTrashedFilesService = async (ownerId) => {
+  const files = await prisma.file.findMany({
+    where: {
+      ownerId,
+      isTrashed: true,
+    },
+    orderBy: {
+      updatedAt: "desc",
+    },
+  });
+
+  return {
+    success: true,
+    files: files.map((file) => ({
+      ...file,
+      size: Number(file.size),
+    })),
+  };
+};
+
+export const restoreFileService = async (fileId, ownerId) => {
+  const file = await prisma.file.findUnique({
+    where: {
+      id: fileId,
+    },
+  });
+
+  if (!file) {
+    throw new ApiError(404, "File not found");
+  }
+
+  if (file.ownerId !== ownerId) {
+    throw new ApiError(403, "You do not have permission to restore this file");
+  }
+
+  if (!file.isTrashed) {
+    throw new ApiError(400, "File is not in trash");
+  }
+
+  const restoredFile = await prisma.file.update({
+    where: {
+      id: fileId,
+    },
+    data: {
+      isTrashed: false,
+    },
+  });
+
+  return {
+    success: true,
+    message: "File restored successfully",
+    file: {
+      ...restoredFile,
+      size: Number(restoredFile.size),
+    },
+  };
+};
+
+export const permanentlyDeleteFileService = async (fileId, ownerId) => {
+  const file = await prisma.file.findUnique({
+    where: {
+      id: fileId,
+    },
+  });
+
+  if (!file) {
+    throw new ApiError(404, "File not found");
+  }
+
+  if (file.ownerId !== ownerId) {
+    throw new ApiError(403, "You do not have permission to delete this file");
+  }
+
+  try {
+    let resourceType = "raw";
+
+    if (file.mimeType?.startsWith("image/")) {
+      resourceType = "image";
+    } else if (file.mimeType?.startsWith("video/")) {
+      resourceType = "video";
+    }
+
+    await cloudinary.uploader.destroy(file.publicId, {
+      resource_type: resourceType,
+    });
+  } catch (error) {
+    console.error("Cloudinary deletion failed:", error.message);
+  }
+
+  await prisma.file.delete({
+    where: {
+      id: fileId,
+    },
+  });
+
+  return {
+    success: true,
+    message: "File permanently deleted",
+  };
+};

@@ -186,12 +186,7 @@ const DashboardPage = () => {
       <DeleteFileModal
         file={fileToDelete}
         onClose={() => setFileToDelete(null)}
-        onConfirm={() => {
-          if (!fileToDelete) return;
-
-          moveFileToTrash(fileToDelete.id);
-          setFileToDelete(null);
-        }}
+        onConfirm={handleMoveFileToTrash}
       />
 
       <RenameFolderModal
