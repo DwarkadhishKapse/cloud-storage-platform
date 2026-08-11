@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import useFolderStore from "../store/useFolderStore";
 import useFileStore from "../store/useFileStore";
@@ -11,13 +11,17 @@ import DeleteFileModal from "../components/DeleteFileModal";
 import FileDetailsPanel from "../components/FileDetailsPanel";
 import { formatFileSize } from "../utils/formatFileSize";
 import { downloadFile } from "../utils/downloadFile";
+import { getFiles } from "../services/file.service";
 
 const FavoritesPage = () => {
   const navigate = useNavigate();
+
   const { folders, toggleFolderFavorite, renameFolder, moveToTrash } =
     useFolderStore();
+
   const {
     files,
+    setFiles,
     toggleFileFavorite,
     previewFile,
     setPreviewFile,
@@ -31,14 +35,41 @@ const FavoritesPage = () => {
   const [folderToDelete, setFolderToDelete] = useState(null);
   const [folderToEdit, setFolderToEdit] = useState(null);
   const [fileToDelete, setFileToDelete] = useState(null);
+  const [loadingFiles, setLoadingFiles] = useState(true);
+
+  useEffect(() => {
+    const fetchFiles = async () => {
+      try {
+        const response = await getFiles();
+        setFiles(response.files);
+      } catch (error) {
+        console.error("Failed to fetch files:", error);
+      } finally {
+        setLoadingFiles(false);
+      }
+    };
+
+    fetchFiles();
+  }, [setFiles]);
 
   const activeFolders = folders.filter((folder) => !folder.isDeleted);
-  const favoriteFolders = activeFolders.filter((folder) => folder.isFavorite);
+  const favoriteFolders = activeFolders.filter(
+    (folder) => folder.isFavorite,
+  );
 
-  const activeFiles = files.filter((file) => !file.isDeleted);
+  const activeFiles = files.filter((file) => !file.isTrashed);
   const favoriteFiles = activeFiles.filter((file) => file.isFavorite);
 
-  const hasFavorites = favoriteFolders.length > 0 || favoriteFiles.length > 0;
+  const hasFavorites =
+    favoriteFolders.length > 0 || favoriteFiles.length > 0;
+
+  if (loadingFiles) {
+    return (
+      <div className="mt-20 text-center text-slate-500">
+        Loading favorites...
+      </div>
+    );
+  }
 
   if (!hasFavorites) {
     return (
@@ -46,18 +77,23 @@ const FavoritesPage = () => {
         <h2 className="text-2xl font-semibold text-slate-700">
           No favorites yet
         </h2>
+
         <p className="mt-3 text-slate-500">
           Star files and folders to access them quickly.
         </p>
       </div>
     );
   }
+
   return (
     <div>
       <h1 className="mb-8 text-4xl font-bold text-slate-900">Favorites</h1>
+
       {favoriteFolders.length > 0 && (
         <div>
-          <h2 className="mb-5 text-2xl font-bold text-slate-900">Folders</h2>
+          <h2 className="mb-5 text-2xl font-bold text-slate-900">
+            Folders
+          </h2>
 
           <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
             {favoriteFolders.map((folder) => (
@@ -81,7 +117,9 @@ const FavoritesPage = () => {
 
       {favoriteFiles.length > 0 && (
         <div className="mt-10">
-          <h2 className="mb-5 text-2xl font-bold text-slate-900">Files</h2>
+          <h2 className="mb-5 text-2xl font-bold text-slate-900">
+            Files
+          </h2>
 
           <div className="space-y-4">
             {favoriteFiles.map((file) => (
@@ -101,9 +139,15 @@ const FavoritesPage = () => {
         </div>
       )}
 
-      <PreviewFileModal file={previewFile} onClose={closePreview} />
+      <PreviewFileModal
+        file={previewFile}
+        onClose={closePreview}
+      />
 
-      <FileDetailsPanel file={detailFile} onClose={closeDetail} />
+      <FileDetailsPanel
+        file={detailFile}
+        onClose={closeDetail}
+      />
 
       <DeleteFolderModal
         folder={folderToDelete}
@@ -132,6 +176,7 @@ const FavoritesPage = () => {
         onClose={() => setFileToDelete(null)}
         onConfirm={() => {
           if (!fileToDelete) return;
+
           moveFileToTrash(fileToDelete.id);
           setFileToDelete(null);
         }}

@@ -130,3 +130,39 @@ export const moveFileToTrashService = async (fileId, ownerId) => {
     message: "File moved to trash successfully",
   };
 };
+
+export const toggleFileFavoriteService = async (fileId, ownerId) => {
+  const file = await prisma.file.findUnique({
+    where: {
+      id: fileId,
+    },
+  });
+
+  if (!file) {
+    throw new ApiError(404, "File not found");
+  }
+
+  if (file.ownerId !== ownerId) {
+    throw new ApiError(403, "You do not have permission to modify this file");
+  }
+
+  const updatedFile = await prisma.file.update({
+    where: {
+      id: fileId,
+    },
+    data: {
+      isFavorite: !file.isFavorite,
+    },
+  });
+
+  return {
+    success: true,
+    message: updatedFile.isFavorite
+      ? "File added to favorites"
+      : "File removed from favorites",
+    file: {
+      ...updatedFile,
+      size: Number(updatedFile.size),
+    },
+  };
+};

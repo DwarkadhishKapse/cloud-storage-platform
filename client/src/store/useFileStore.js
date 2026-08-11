@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import { toggleFileFavorite as toggleFileFavoriteService } from "../services/file.service";
 
 const useFileStore = create((set) => ({
   files: [],
@@ -37,12 +38,13 @@ const useFileStore = create((set) => ({
       detailFile: null,
     }),
 
-  toggleFileFavorite: (id) =>
+  toggleFileFavorite: async (id) => {
+    const response = await toggleFileFavoriteService(id);
+
     set((state) => ({
-      files: state.files.map((file) =>
-        file.id === id ? { ...file, isFavorite: !file.isFavorite } : file,
-      ),
-    })),
+      files: state.files.map((file) => (file.id === id ? response.file : file)),
+    }));
+  },
 
   moveFileToTrash: (id) =>
     set((state) => ({

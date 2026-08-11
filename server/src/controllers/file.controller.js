@@ -3,6 +3,7 @@ import {
   uploadFileService,
   getFilesService,
   moveFileToTrashService,
+  toggleFileFavoriteService,
 } from "../services/file.service.js";
 
 export const uploadFile = asyncHandler(async (req, res) => {
@@ -19,6 +20,12 @@ export const getFiles = asyncHandler(async (req, res) => {
 
 export const moveFileToTrash = asyncHandler(async (req, res) => {
   const result = await moveFileToTrashService(req.params.id, req.user.id);
+
+  return res.status(200).json(result);
+});
+
+export const toggleFileFavorite = asyncHandler(async (req, res) => {
+  const result = await toggleFileFavoriteService(req.params.id, req.user.id);
 
   return res.status(200).json(result);
 });

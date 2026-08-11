@@ -13,7 +13,13 @@ export const uploadFile = async (formData) => {
 };
 
 export const moveFileToTrash = async (fileId) => {
-  const response = await api.patch(`files/${fileId}/trash`);
+  const response = await api.patch(`/files/${fileId}/trash`);
+
+  return response.data;
+};
+
+export const toggleFileFavorite = async (fileId) => {
+  const response = await api.patch(`/files/${fileId}/favorite`);
 
   return response.data;
 };
