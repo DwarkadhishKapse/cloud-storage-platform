@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import useFolderStore from "../store/useFolderStore";
 import { createFolder } from "../services/folder.service";
 
-const CreateFolderModal = ({ isOpen, onClose }) => {
+const CreateFolderModal = ({ isOpen, onClose, parentId, onFolderCreated }) => {
   const [folderName, setFolderName] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -23,9 +23,16 @@ const CreateFolderModal = ({ isOpen, onClose }) => {
 
       const response = await createFolder({
         name,
+        parentId,
       });
 
-      addFolder(response.folder);
+      // Only add root folders to the Dashboard store
+      if (!parentId) {
+        addFolder(response.folder);
+      }
+
+      // Tell the current FolderPage to fetch its contents again
+      onFolderCreated();
 
       setFolderName("");
       onClose();

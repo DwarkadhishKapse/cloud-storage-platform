@@ -9,6 +9,7 @@ import {
   restoreFolderService,
   permanentlyDeleteFolderService,
   toggleFolderFavoriteService,
+  getFolderContentsService,
 } from "../services/folder.service.js";
 
 export const createFolder = asyncHandler(async (req, res) => {
@@ -62,6 +63,12 @@ export const permanentlyDeleteFolder = asyncHandler(async (req, res) => {
 
 export const toggleFolderFavorite = asyncHandler(async (req, res) => {
   const result = await toggleFolderFavoriteService(req.params.id, req.user.id);
+
+  return res.status(200).json(result);
+});
+
+export const getFolderContents = asyncHandler(async (req, res) => {
+  const result = await getFolderContentsService(req.params.id, req.user.id);
 
   return res.status(200).json(result);
 });

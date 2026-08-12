@@ -20,12 +20,6 @@ export const renameFolder = async (folderId, name) => {
   return response.data;
 };
 
-export const deleteFolder = async (folderId) => {
-  const response = await api.delete(`/folders/${folderId}`);
-
-  return response.data;
-};
-
 export const toggleFolderFavorite = async (folderId) => {
   const response = await api.patch(`/folders/${folderId}/favorite`);
 
@@ -52,6 +46,12 @@ export const restoreFolder = async (folderId) => {
 
 export const permanentlyDeleteFolder = async (folderId) => {
   const response = await api.delete(`/folders/${folderId}/permanent`);
+
+  return response.data;
+};
+
+export const getFolderContents = async (folderId) => {
+  const response = await api.get(`/folders/${folderId}`);
 
   return response.data;
 };

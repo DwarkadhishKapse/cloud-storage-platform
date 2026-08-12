@@ -24,6 +24,13 @@ export const createFolderService = async (folderData, ownerId) => {
     if (parentFolder.ownerId !== ownerId) {
       throw new ApiError(403, "You are not allowed to access this folder.");
     }
+
+    if (parentFolder.isTrashed) {
+      throw new ApiError(
+        400,
+        "Cannot create a folder inside a trashed folder.",
+      );
+    }
   }
 
   const folder = await prisma.folder.create({
@@ -45,6 +52,8 @@ export const getFoldersService = async (ownerId) => {
   const folders = await prisma.folder.findMany({
     where: {
       ownerId,
+      parentId: null,
+      isTrashed: false,
     },
     orderBy: {
       createdAt: "desc",
@@ -246,5 +255,49 @@ export const toggleFolderFavoriteService = async (folderId, ownerId) => {
       ? "Folder added to favorites."
       : "Folder removed from favorites.",
     folder: updatedFolder,
+  };
+};
+
+export const getFolderContentsService = async (folderId, ownerId) => {
+  const folder = await prisma.folder.findUnique({
+    where: {
+      id: folderId,
+    },
+    include: {
+      children: {
+        where: {
+          isTrashed: false,
+        },
+        orderBy: {
+          createdAt: "desc",
+        },
+      },
+      files: {
+        where: {
+          isTrashed: false,
+        },
+        orderBy: {
+          createdAt: "desc",
+        },
+      },
+    },
+  });
+
+  if (!folder) {
+    throw new ApiError(404, "Folder not found");
+  }
+
+  if (folder.ownerId !== ownerId) {
+    throw new ApiError(403, "You are not allowed to access this folder");
+  }
+
+  return {
+    success: true,
+    folder,
+    folders: folder.children,
+    files: folder.files.map((file) => ({
+      ...file,
+      size: Number(file.size),
+    })),
   };
 };
