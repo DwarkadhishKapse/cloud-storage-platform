@@ -291,11 +291,13 @@ export const getFolderContentsService = async (folderId, ownerId) => {
     throw new ApiError(403, "You are not allowed to access this folder");
   }
 
+  const { children, files, ...folderData } = folder;
+
   return {
     success: true,
-    folder,
-    folders: folder.children,
-    files: folder.files.map((file) => ({
+    folder: folderData,
+    folders: children,
+    files: files.map((file) => ({
       ...file,
       size: Number(file.size),
     })),

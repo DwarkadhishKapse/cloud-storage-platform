@@ -3,8 +3,10 @@ import useFileStore from "../store/useFileStore";
 import { formatFileSize } from "../utils/formatFileSize";
 import { uploadFile } from "../services/file.service";
 
-const UploadFileModal = ({ isOpen, onClose }) => {
+const UploadFileModal = ({ isOpen, onClose, parentId, onUploadSuccess }) => {
   const [selectedFile, setSelectedFile] = useState(null);
+  const [loading, setLoading] = useState(false);
+
   const fileInputRef = useRef(null);
 
   const { addFile } = useFileStore();
@@ -26,12 +28,25 @@ const UploadFileModal = ({ isOpen, onClose }) => {
     }
 
     try {
+      setLoading(true);
+
       const formData = new FormData();
+
       formData.append("file", selectedFile);
+
+      if (parentId) {
+        formData.append("folderId", parentId);
+      }
 
       const response = await uploadFile(formData);
 
-      addFile(response.file);
+      if (!parentId) {
+        addFile(response.file);
+      }
+
+      if (onUploadSuccess) {
+        onUploadSuccess();
+      }
 
       setSelectedFile(null);
 
@@ -42,6 +57,8 @@ const UploadFileModal = ({ isOpen, onClose }) => {
       onClose();
     } catch (error) {
       console.error("Failed to upload file:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -58,20 +75,20 @@ const UploadFileModal = ({ isOpen, onClose }) => {
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black/30">
       <div className="w-full max-w-md rounded-3xl bg-white p-6 shadow-xl">
-        <h2 className="mb-6 text-2xl font-bold text-slate-900">
-          Upload File
-        </h2>
+        <h2 className="mb-6 text-2xl font-bold text-slate-900">Upload File</h2>
 
         <input
           ref={fileInputRef}
           type="file"
           onChange={handleFileChange}
           className="hidden"
+          disabled={loading}
         />
 
         <button
           onClick={() => fileInputRef.current?.click()}
-          className="mb-4 rounded-2xl bg-emerald-600 px-4 py-2 text-white transition hover:bg-emerald-700"
+          disabled={loading}
+          className="mb-4 rounded-2xl bg-emerald-600 px-4 py-2 text-white transition hover:bg-emerald-700 disabled:cursor-not-allowed disabled:bg-slate-300"
         >
           Choose File
         </button>
@@ -93,17 +110,18 @@ const UploadFileModal = ({ isOpen, onClose }) => {
         <div className="flex justify-end gap-3">
           <button
             onClick={handleCancel}
-            className="rounded-2xl px-5 py-2 text-slate-600 hover:bg-slate-100"
+            disabled={loading}
+            className="rounded-2xl px-5 py-2 text-slate-600 hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-50"
           >
             Cancel
           </button>
 
           <button
             onClick={handleUpload}
-            disabled={!selectedFile}
+            disabled={!selectedFile || loading}
             className="rounded-2xl bg-emerald-600 px-5 py-2 text-white transition hover:bg-emerald-700 disabled:cursor-not-allowed disabled:bg-slate-300"
           >
-            Upload
+            {loading ? "Uploading..." : "Upload"}
           </button>
         </div>
       </div>
