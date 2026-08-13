@@ -18,6 +18,20 @@ export const uploadFile = async (formData) => {
   return response.data;
 };
 
+export const toggleFileFavorite = async (fileId) => {
+  const response = await api.patch(`/files/${fileId}/favorite`);
+
+  return response.data;
+};
+
+export const downloadFile = async (fileId) => {
+  const response = await api.get(`/files/${fileId}/download`, {
+    responseType: "blob",
+  });
+
+  return response;
+};
+
 export const moveFileToTrash = async (fileId) => {
   const response = await api.patch(`/files/${fileId}/trash`);
 

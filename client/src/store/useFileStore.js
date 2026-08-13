@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import { toggleFileFavorite as toggleFileFavoriteApi } from "../services/file.service";
 
 const useFileStore = create((set) => ({
   files: [],
@@ -37,17 +38,22 @@ const useFileStore = create((set) => ({
       detailFile: null,
     }),
 
-  toggleFileFavorite: (id) =>
-    set((state) => ({
-      files: state.files.map((file) =>
-        file.id === id
-          ? {
-              ...file,
-              isFavorite: !file.isFavorite,
-            }
-          : file,
-      ),
-    })),
+  toggleFileFavorite: async (id) => {
+    try {
+      const response = await toggleFileFavoriteApi(id);
+
+      set((state) => ({
+        files: state.files.map((file) =>
+          file.id === id ? response.file : file,
+        ),
+      }));
+
+      return response.file;
+    } catch (error) {
+      console.error("Failed to toggle file favorite:", error);
+      throw error;
+    }
+  },
 
   moveFileToTrash: (id) =>
     set((state) => ({

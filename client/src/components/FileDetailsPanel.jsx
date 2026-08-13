@@ -48,7 +48,7 @@ const FileDetailsPanel = ({ file, onClose }) => {
             <div>
               <p className="text-sm font-medium text-gray-500">Type</p>
               <p className="mt-2 text-base text-slate-900">
-                {file.type || "Unknown"}
+                {file.mimeType || "Unknown"}
               </p>
             </div>
 

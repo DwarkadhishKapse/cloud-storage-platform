@@ -4,9 +4,16 @@ import { useNavigate, useParams, useOutletContext } from "react-router-dom";
 import Breadcrumb from "../components/Breadcrumb";
 import FolderCard from "../components/FolderCard";
 import FileCard from "../components/FileCard";
+import PreviewFileModal from "../components/PreviewFileModal";
+import FileDetailsPanel from "../components/FileDetailsPanel";
+import DeleteFileModal from "../components/DeleteFileModal";
+import useFileStore from "../store/useFileStore";
 
 import { getFolderContents } from "../services/folder.service";
+import { moveFileToTrash } from "../services/file.service";
+
 import { formatFileSize } from "../utils/formatFileSize";
+import { downloadFile } from "../utils/downloadFile";
 
 const FolderPage = () => {
   const { id } = useParams();
@@ -18,6 +25,11 @@ const FolderPage = () => {
   const [folders, setFolders] = useState([]);
   const [files, setFiles] = useState([]);
   const [loading, setLoading] = useState(true);
+  const { toggleFileFavorite } = useFileStore();
+
+  const [previewFile, setPreviewFile] = useState(null);
+  const [detailFile, setDetailFile] = useState(null);
+  const [fileToDelete, setFileToDelete] = useState(null);
 
   useEffect(() => {
     const fetchFolder = async () => {
@@ -42,6 +54,38 @@ const FolderPage = () => {
 
     fetchFolder();
   }, [id, folderRefreshKey]);
+
+  const handleToggleFavorite = async (fileId) => {
+    try {
+      const updatedFile = await toggleFileFavorite(fileId);
+
+      setFiles((currentFiles) =>
+        currentFiles.map((file) => (file.id === fileId ? updatedFile : file)),
+      );
+
+      setDetailFile((currentFile) =>
+        currentFile?.id === fileId ? updatedFile : currentFile,
+      );
+    } catch (error) {
+      console.error("Failed to toggle file favorite:", error);
+    }
+  };
+
+  const handleMoveFileToTrash = async () => {
+    if (!fileToDelete) return;
+
+    try {
+      await moveFileToTrash(fileToDelete.id);
+
+      setFiles((currentFiles) =>
+        currentFiles.filter((file) => file.id !== fileToDelete.id),
+      );
+
+      setFileToDelete(null);
+    } catch (error) {
+      console.error("Failed to move file to trash:", error);
+    }
+  };
 
   if (loading) {
     return (
@@ -90,6 +134,12 @@ const FolderPage = () => {
                 key={file.id}
                 name={file.name}
                 size={formatFileSize(file.size)}
+                isFavorite={file.isFavorite}
+                onClick={() => setPreviewFile(file)}
+                onFavorite={() => handleToggleFavorite(file.id)}
+                onDownload={() => downloadFile(file)}
+                onDelete={() => setFileToDelete(file)}
+                onDetail={() => setDetailFile(file)}
               />
             ))}
           </div>
@@ -101,6 +151,19 @@ const FolderPage = () => {
           <p className="text-slate-500">This folder is empty.</p>
         </div>
       )}
+
+      <PreviewFileModal
+        file={previewFile}
+        onClose={() => setPreviewFile(null)}
+      />
+
+      <FileDetailsPanel file={detailFile} onClose={() => setDetailFile(null)} />
+
+      <DeleteFileModal
+        file={fileToDelete}
+        onClose={() => setFileToDelete(null)}
+        onConfirm={handleMoveFileToTrash}
+      />
     </div>
   );
 };

@@ -63,7 +63,7 @@ const FavoritesPage = () => {
     fetchFavoritesData();
   }, [setFiles, setFolders]);
 
-  const activeFolders = folders.filter((folder) => !folder.isDeleted);
+  const activeFolders = folders.filter((folder) => !folder.isTrashed);
   const favoriteFolders = activeFolders.filter((folder) => folder.isFavorite);
 
   const activeFiles = files.filter((file) => !file.isTrashed);

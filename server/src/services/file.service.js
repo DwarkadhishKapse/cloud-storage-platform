@@ -36,6 +36,7 @@ export const uploadFileService = async (file, body, ownerId) => {
         {
           folder: "cloud-storage-platform",
           resource_type: "auto",
+          filename_override: file.originalname,
         },
         (error, result) => {
           if (error) {
@@ -165,6 +166,28 @@ export const toggleFileFavoriteService = async (fileId, ownerId) => {
       size: Number(updatedFile.size),
     },
   };
+};
+
+export const getFileForDownloadService = async (fileId, ownerId) => {
+  const file = await prisma.file.findUnique({
+    where: {
+      id: fileId,
+    },
+  });
+
+  if (!file) {
+    throw new ApiError(404, "File not found");
+  }
+
+  if (file.ownerId !== ownerId) {
+    throw new ApiError(403, "You do not have permission to download this file");
+  }
+
+  if (file.isTrashed) {
+    throw new ApiError(400, "This file is in trash");
+  }
+
+  return file;
 };
 
 export const getTrashedFilesService = async (ownerId) => {
