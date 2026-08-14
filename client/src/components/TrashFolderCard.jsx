@@ -2,11 +2,12 @@ import React from "react";
 import {
   FiChevronDown,
   FiChevronRight,
-  FiFileText,
   FiFolder,
   FiRotateCcw,
   FiTrash2,
 } from "react-icons/fi";
+
+import TrashFileCard from "./TrashFileCard";
 import { formatFileSize } from "../utils/formatFileSize";
 
 const TrashFolderCard = ({
@@ -15,6 +16,9 @@ const TrashFolderCard = ({
   files = [],
   onRestore,
   onDeleteForever,
+  onOpenFile,
+  onRestoreFile,
+  onDeleteForeverFile,
   isNested = false,
 }) => {
   const [isExpanded, setIsExpanded] = React.useState(!isNested);
@@ -51,25 +55,23 @@ const TrashFolderCard = ({
           <h3 className="truncate font-semibold text-slate-800">{name}</h3>
         </div>
 
-        {!isNested && (
-          <div className="flex shrink-0 items-center gap-2">
-            <button
-              onClick={onRestore}
-              className="flex items-center gap-2 rounded-xl bg-emerald-50 px-4 py-2 text-sm font-medium text-emerald-700 transition hover:bg-emerald-100"
-            >
-              <FiRotateCcw size={16} />
-              Restore
-            </button>
+        <div className="flex shrink-0 items-center gap-2">
+          <button
+            onClick={onRestore}
+            className="rounded-xl bg-emerald-50 p-2 text-emerald-700 transition hover:bg-emerald-100"
+            title="Restore"
+          >
+            <FiRotateCcw size={16} />
+          </button>
 
-            <button
-              onClick={onDeleteForever}
-              className="flex items-center gap-2 rounded-xl bg-red-50 px-4 py-2 text-sm font-medium text-red-600 transition hover:bg-red-100"
-            >
-              <FiTrash2 size={16} />
-              Delete Forever
-            </button>
-          </div>
-        )}
+          <button
+            onClick={onDeleteForever}
+            className="rounded-xl bg-red-50 p-2 text-red-600 transition hover:bg-red-100"
+            title="Delete Forever"
+          >
+            <FiTrash2 size={16} />
+          </button>
+        </div>
       </div>
 
       {isExpanded && hasChildren && (
@@ -81,29 +83,24 @@ const TrashFolderCard = ({
                 name={folder.name}
                 folders={folder.children}
                 files={folder.files}
+                onRestore={() => onRestoreFile?.(folder)}
+                onDeleteForever={() => onDeleteForeverFile?.(folder)}
+                onOpenFile={onOpenFile}
+                onRestoreFile={onRestoreFile}
+                onDeleteForeverFile={onDeleteForeverFile}
                 isNested
               />
             ))}
 
             {files.map((file) => (
-              <div
+              <TrashFileCard
                 key={file.id}
-                className="flex items-center justify-between rounded-xl border border-slate-200 bg-white px-4 py-3"
-              >
-                <div className="flex min-w-0 items-center gap-3">
-                  <FiFileText size={20} className="shrink-0 text-slate-400" />
-
-                  <div className="min-w-0">
-                    <p className="truncate text-sm font-medium text-slate-700">
-                      {file.name}
-                    </p>
-
-                    <p className="text-xs text-slate-400">
-                      {formatFileSize(file.size)}
-                    </p>
-                  </div>
-                </div>
-              </div>
+                name={file.name}
+                size={formatFileSize(file.size)}
+                onClick={() => onOpenFile?.(file)}
+                onRestore={() => onRestoreFile?.(file)}
+                onDeleteForever={() => onDeleteForeverFile?.(file)}
+              />
             ))}
           </div>
         </div>

@@ -1,5 +1,6 @@
 import { create } from "zustand";
 
+import useFileStore from "./useFileStore";
 import {
   toggleFolderFavorite,
   moveFolderToTrash,
@@ -47,6 +48,10 @@ const useFolderStore = create((set) => ({
         ),
       }));
 
+      if (response.fileIds?.length) {
+        useFileStore.getState().moveFilesToTrash(response.fileIds);
+      }
+
       return response;
     } catch (error) {
       console.error("Failed to move folder to trash:", error);
@@ -69,6 +74,10 @@ const useFolderStore = create((set) => ({
         ),
       }));
 
+      if (response.fileIds?.length) {
+        useFileStore.getState().restoreFiles(response.fileIds);
+      }
+
       return response;
     } catch (error) {
       console.error("Failed to restore folder:", error);
@@ -85,6 +94,10 @@ const useFolderStore = create((set) => ({
           (folder) => !response.folderIds.includes(folder.id),
         ),
       }));
+
+      if (response.fileIds?.length) {
+        useFileStore.getState().permanentlyDeleteFiles(response.fileIds);
+      }
 
       return response;
     } catch (error) {

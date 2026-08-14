@@ -33,6 +33,37 @@ const TrashPage = () => {
 
   const [loading, setLoading] = useState(true);
 
+  const buildTrashTree = (folderList, fileList) => {
+    const folderMap = new Map(
+      folderList.map((folder) => [folder.id, { ...folder, children: [], files: [] }]),
+    );
+
+    const rootFolders = [];
+    const rootFiles = [];
+
+    folderList.forEach((folder) => {
+      const node = folderMap.get(folder.id);
+
+      if (folder.parentId && folderMap.has(folder.parentId)) {
+        folderMap.get(folder.parentId).children.push(node);
+      } else {
+        rootFolders.push(node);
+      }
+    });
+
+    fileList.forEach((file) => {
+      const parentFolder = folderMap.get(file.folderId);
+
+      if (parentFolder) {
+        parentFolder.files.push(file);
+      } else {
+        rootFiles.push(file);
+      }
+    });
+
+    return { rootFolders, rootFiles };
+  };
+
   useEffect(() => {
     const fetchTrash = async () => {
       try {
@@ -55,6 +86,7 @@ const TrashPage = () => {
 
   const trashFolders = folders.filter((folder) => folder.isTrashed);
   const trashFiles = files.filter((file) => file.isTrashed);
+  const { rootFolders, rootFiles } = buildTrashTree(trashFolders, trashFiles);
 
   const handleRestoreFile = async (file) => {
     try {
@@ -72,6 +104,12 @@ const TrashPage = () => {
     } catch (error) {
       console.error("Failed to restore folder:", error);
     }
+  };
+
+  const handleDeleteForeverFolder = async (folder) => {
+    if (!folder) return;
+
+    setFolderToDelete(folder);
   };
 
   const handlePermanentlyDeleteFile = async () => {
@@ -104,7 +142,7 @@ const TrashPage = () => {
     }
   };
 
-  const hasTrash = trashFolders.length > 0 || trashFiles.length > 0;
+  const hasTrash = rootFolders.length > 0 || rootFiles.length > 0;
 
   if (loading) {
     return (
@@ -132,29 +170,38 @@ const TrashPage = () => {
     <div>
       <h1 className="mb-8 text-4xl font-bold text-slate-900">Trash</h1>
 
-      {trashFolders.length > 0 && (
+      {rootFolders.length > 0 && (
         <div>
           <h2 className="mb-5 text-2xl font-bold text-slate-900">Folders</h2>
 
           <div className="space-y-4">
-            {trashFolders.map((folder) => (
+            {rootFolders.map((folder) => (
               <TrashFolderCard
                 key={folder.id}
                 name={folder.name}
+                folders={folder.children}
+                files={folder.files}
                 onRestore={() => handleRestoreFolder(folder)}
-                onDeleteForever={() => setFolderToDelete(folder)}
+                onDeleteForever={() => handleDeleteForeverFolder(folder)}
+                onOpenFile={(file) => setPreviewFile(file)}
+                onRestoreFile={(file) =>
+                  file?.folderId ? handleRestoreFile(file) : handleRestoreFolder(file)
+                }
+                onDeleteForeverFile={(file) =>
+                  file?.folderId ? setFileToDelete(file) : setFolderToDelete(file)
+                }
               />
             ))}
           </div>
         </div>
       )}
 
-      {trashFiles.length > 0 && (
+      {rootFiles.length > 0 && (
         <div className="mt-10">
           <h2 className="mb-5 text-2xl font-bold text-slate-900">Files</h2>
 
           <div className="space-y-4">
-            {trashFiles.map((file) => (
+            {rootFiles.map((file) => (
               <TrashFileCard
                 key={file.id}
                 name={file.name}
