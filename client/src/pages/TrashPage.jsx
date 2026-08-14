@@ -8,6 +8,7 @@ import TrashFileCard from "../components/TrashFileCard";
 
 import DeleteForeverFolderModal from "../components/DeleteForeverFolderModal";
 import DeleteForeverFileModal from "../components/DeleteForeverFileModal";
+import PreviewFileModal from "../components/PreviewFileModal";
 
 import { formatFileSize } from "../utils/formatFileSize";
 
@@ -28,10 +29,10 @@ const TrashPage = () => {
 
   const [folderToDelete, setFolderToDelete] = useState(null);
   const [fileToDelete, setFileToDelete] = useState(null);
+  const [previewFile, setPreviewFile] = useState(null);
 
   const [loading, setLoading] = useState(true);
 
-  // Fetch trashed folders and files
   useEffect(() => {
     const fetchTrash = async () => {
       try {
@@ -53,10 +54,8 @@ const TrashPage = () => {
   }, [setFolders, setFiles]);
 
   const trashFolders = folders.filter((folder) => folder.isTrashed);
-
   const trashFiles = files.filter((file) => file.isTrashed);
 
-  // Restore file
   const handleRestoreFile = async (file) => {
     try {
       await restoreFileApi(file.id);
@@ -67,7 +66,6 @@ const TrashPage = () => {
     }
   };
 
-  // Restore folder
   const handleRestoreFolder = async (folder) => {
     try {
       await restoreFolder(folder.id);
@@ -76,7 +74,6 @@ const TrashPage = () => {
     }
   };
 
-  // Permanently delete file
   const handlePermanentlyDeleteFile = async () => {
     if (!fileToDelete) return;
 
@@ -86,12 +83,15 @@ const TrashPage = () => {
       permanentlyDeleteFile(fileToDelete.id);
 
       setFileToDelete(null);
+
+      if (previewFile?.id === fileToDelete.id) {
+        setPreviewFile(null);
+      }
     } catch (error) {
       console.error("Failed to permanently delete file:", error);
     }
   };
 
-  // Permanently delete folder
   const handlePermanentlyDeleteFolder = async () => {
     if (!folderToDelete) return;
 
@@ -132,7 +132,6 @@ const TrashPage = () => {
     <div>
       <h1 className="mb-8 text-4xl font-bold text-slate-900">Trash</h1>
 
-      {/* Folders */}
       {trashFolders.length > 0 && (
         <div>
           <h2 className="mb-5 text-2xl font-bold text-slate-900">Folders</h2>
@@ -150,7 +149,6 @@ const TrashPage = () => {
         </div>
       )}
 
-      {/* Files */}
       {trashFiles.length > 0 && (
         <div className="mt-10">
           <h2 className="mb-5 text-2xl font-bold text-slate-900">Files</h2>
@@ -161,6 +159,7 @@ const TrashPage = () => {
                 key={file.id}
                 name={file.name}
                 size={formatFileSize(file.size)}
+                onClick={() => setPreviewFile(file)}
                 onRestore={() => handleRestoreFile(file)}
                 onDeleteForever={() => setFileToDelete(file)}
               />
@@ -169,14 +168,17 @@ const TrashPage = () => {
         </div>
       )}
 
-      {/* Delete Forever Folder Modal */}
+      <PreviewFileModal
+        file={previewFile}
+        onClose={() => setPreviewFile(null)}
+      />
+
       <DeleteForeverFolderModal
         folder={folderToDelete}
         onClose={() => setFolderToDelete(null)}
         onConfirm={handlePermanentlyDeleteFolder}
       />
 
-      {/* Delete Forever File Modal */}
       <DeleteForeverFileModal
         file={fileToDelete}
         onClose={() => setFileToDelete(null)}

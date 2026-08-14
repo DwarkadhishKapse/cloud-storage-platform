@@ -267,20 +267,25 @@ export const permanentlyDeleteFileService = async (fileId, ownerId) => {
     throw new ApiError(400, "File is not in trash");
   }
 
+  let resourceType = "raw";
+
+  if (file.mimeType?.startsWith("image/")) {
+    resourceType = "image";
+  } else if (file.mimeType?.startsWith("video/")) {
+    resourceType = "video";
+  }
+
   try {
-    let resourceType = "raw";
-
-    if (file.mimeType?.startsWith("image/")) {
-      resourceType = "image";
-    } else if (file.mimeType?.startsWith("video/")) {
-      resourceType = "video";
-    }
-
     await cloudinary.uploader.destroy(file.publicId, {
       resource_type: resourceType,
     });
   } catch (error) {
     console.error("Cloudinary deletion failed:", error.message);
+
+    throw new ApiError(
+      502,
+      "Unable to delete the file from storage. Please try again.",
+    );
   }
 
   await prisma.file.delete({

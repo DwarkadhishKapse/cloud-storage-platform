@@ -7,7 +7,9 @@ import FileCard from "../components/FileCard";
 import PreviewFileModal from "../components/PreviewFileModal";
 import FileDetailsPanel from "../components/FileDetailsPanel";
 import DeleteFileModal from "../components/DeleteFileModal";
+import DeleteFolderModal from "../components/DeleteFolderModal";
 import useFileStore from "../store/useFileStore";
+import useFolderStore from "../store/useFolderStore";
 
 import { getFolderContents } from "../services/folder.service";
 import { moveFileToTrash } from "../services/file.service";
@@ -30,6 +32,9 @@ const FolderPage = () => {
   const [previewFile, setPreviewFile] = useState(null);
   const [detailFile, setDetailFile] = useState(null);
   const [fileToDelete, setFileToDelete] = useState(null);
+  const [folderToDelete, setFolderToDelete] = useState(null);
+
+  const { moveToTrash } = useFolderStore();
 
   useEffect(() => {
     const fetchFolder = async () => {
@@ -87,6 +92,21 @@ const FolderPage = () => {
     }
   };
 
+  const handleMoveFolderToTrash = async () => {
+    if (!folderToDelete) return;
+
+    try {
+      await moveToTrash(folderToDelete.id);
+      setFolders((currentFolders) =>
+        currentFolders.filter((folderItem) => folderItem.id !== folderToDelete.id),
+      );
+      setFolderToDelete(null);
+      navigate(-1);
+    } catch (error) {
+      console.error("Failed to move folder to trash:", error);
+    }
+  };
+
   if (loading) {
     return (
       <div className="mt-20 text-center text-slate-500">Loading folder...</div>
@@ -99,7 +119,10 @@ const FolderPage = () => {
     );
   }
 
-  const breadcrumbItems = ["Home", folder.name];
+  const breadcrumbItems = folder.breadcrumb || [
+    { label: "Home", path: "/" },
+    { label: folder.name, path: null },
+  ];
 
   return (
     <div>
@@ -118,6 +141,7 @@ const FolderPage = () => {
                 name={childFolder.name}
                 isFavorite={childFolder.isFavorite}
                 onClick={() => navigate(`/folder/${childFolder.id}`)}
+                onDelete={() => setFolderToDelete(childFolder)}
               />
             ))}
           </div>
@@ -158,6 +182,12 @@ const FolderPage = () => {
       />
 
       <FileDetailsPanel file={detailFile} onClose={() => setDetailFile(null)} />
+
+      <DeleteFolderModal
+        folder={folderToDelete}
+        onClose={() => setFolderToDelete(null)}
+        onConfirm={handleMoveFolderToTrash}
+      />
 
       <DeleteFileModal
         file={fileToDelete}

@@ -1,5 +1,61 @@
 import prisma from "../lib/prisma.js";
 import ApiError from "../utils/ApiError.js";
+import cloudinary from "../config/cloudinary.js";
+
+const getFolderSubtree = async (folderId, ownerId) => {
+  const folders = await prisma.folder.findMany({
+    where: {
+      ownerId,
+    },
+  });
+
+  const folderMap = new Map(folders.map((folder) => [folder.id, folder]));
+  const rootFolder = folderMap.get(folderId);
+
+  if (!rootFolder) {
+    throw new ApiError(404, "Folder not found.");
+  }
+
+  const subtree = [];
+  const queue = [folderId];
+
+  while (queue.length > 0) {
+    const currentId = queue.shift();
+    const currentFolder = folderMap.get(currentId);
+
+    if (!currentFolder) continue;
+
+    subtree.push(currentFolder);
+
+    for (const folder of folders) {
+      if (folder.parentId === currentId) {
+        queue.push(folder.id);
+      }
+    }
+  }
+
+  return subtree;
+};
+
+const getFolderDepth = (folder, folderMap) => {
+  let depth = 0;
+  let current = folder;
+
+  while (current.parentId) {
+    const parent = folderMap.get(current.parentId);
+
+    if (!parent) break;
+
+    depth += 1;
+    current = parent;
+  }
+
+  return depth;
+};
+
+const getFolderSubtreeIds = (folders) => {
+  return folders.map((folder) => folder.id);
+};
 
 export const createFolderService = async (folderData, ownerId) => {
   const { name, parentId } = folderData;
@@ -87,6 +143,10 @@ export const renameFolderService = async (folderId, folderData, ownerId) => {
     throw new ApiError(403, "You are not allowed to modify this folder.");
   }
 
+  if (folder.isTrashed) {
+    throw new ApiError(400, "Cannot rename a trashed folder.");
+  }
+
   const updatedFolder = await prisma.folder.update({
     where: {
       id: folderId,
@@ -135,12 +195,54 @@ export const moveFolderToTrashService = async (folderId, ownerId) => {
     throw new ApiError(403, "You are not allowed to modify this folder.");
   }
 
-  const updatedFolder = await prisma.folder.update({
+  if (folder.isTrashed) {
+    throw new ApiError(400, "Folder is already in trash.");
+  }
+
+  const subtree = await getFolderSubtree(folderId, ownerId);
+  const folderIds = getFolderSubtreeIds(subtree);
+
+  const updatedFiles = await prisma.file.updateMany({
     where: {
-      id: folderId,
+      ownerId,
+      folderId: {
+        in: folderIds,
+      },
+      isTrashed: false,
     },
     data: {
       isTrashed: true,
+    },
+  });
+
+  await prisma.folder.updateMany({
+    where: {
+      ownerId,
+      id: {
+        in: folderIds,
+      },
+      isTrashed: false,
+    },
+    data: {
+      isTrashed: true,
+    },
+  });
+
+  const updatedFolder = await prisma.folder.findUnique({
+    where: {
+      id: folderId,
+    },
+  });
+
+  const affectedFiles = await prisma.file.findMany({
+    where: {
+      ownerId,
+      folderId: {
+        in: folderIds,
+      },
+    },
+    select: {
+      id: true,
     },
   });
 
@@ -148,6 +250,9 @@ export const moveFolderToTrashService = async (folderId, ownerId) => {
     success: true,
     message: "Folder moved to trash successfully.",
     folder: updatedFolder,
+    folderIds,
+    fileIds: affectedFiles.map((file) => file.id),
+    affectedFileCount: updatedFiles.count,
   };
 };
 
@@ -166,19 +271,63 @@ export const restoreFolderService = async (folderId, ownerId) => {
     throw new ApiError(403, "You are not allowed to modify this folder.");
   }
 
-  const updatedFolder = await prisma.folder.update({
+  if (!folder.isTrashed) {
+    throw new ApiError(400, "Folder is not in trash.");
+  }
+
+  const subtree = await getFolderSubtree(folderId, ownerId);
+  const folderIds = getFolderSubtreeIds(subtree);
+
+  await prisma.folder.updateMany({
     where: {
-      id: folderId,
+      ownerId,
+      id: {
+        in: folderIds,
+      },
+      isTrashed: true,
     },
     data: {
       isTrashed: false,
     },
   });
 
+  await prisma.file.updateMany({
+    where: {
+      ownerId,
+      folderId: {
+        in: folderIds,
+      },
+      isTrashed: true,
+    },
+    data: {
+      isTrashed: false,
+    },
+  });
+
+  const restoredFolder = await prisma.folder.findUnique({
+    where: {
+      id: folderId,
+    },
+  });
+
+  const restoredFiles = await prisma.file.findMany({
+    where: {
+      ownerId,
+      folderId: {
+        in: folderIds,
+      },
+    },
+    select: {
+      id: true,
+    },
+  });
+
   return {
     success: true,
     message: "Folder restored successfully.",
-    folder: updatedFolder,
+    folder: restoredFolder,
+    folderIds,
+    fileIds: restoredFiles.map((file) => file.id),
   };
 };
 
@@ -197,28 +346,78 @@ export const permanentlyDeleteFolderService = async (folderId, ownerId) => {
     throw new ApiError(403, "You are not allowed to delete this folder.");
   }
 
-  const childFolders = await prisma.folder.findFirst({
-    where: {
-      parentId: folderId,
-    },
-  });
-
-  if (childFolders) {
+  if (!folder.isTrashed) {
     throw new ApiError(
       400,
-      "Cannot permanently delete a folder that contains child folders.",
+      "Folder must be in trash before permanent deletion.",
     );
   }
 
-  await prisma.folder.delete({
+  const subtree = await getFolderSubtree(folderId, ownerId);
+  const folderIds = getFolderSubtreeIds(subtree);
+
+  const files = await prisma.file.findMany({
     where: {
-      id: folderId,
+      ownerId,
+      folderId: {
+        in: folderIds,
+      },
     },
+  });
+
+  for (const file of files) {
+    let resourceType = "raw";
+
+    if (file.mimeType?.startsWith("image/")) {
+      resourceType = "image";
+    } else if (file.mimeType?.startsWith("video/")) {
+      resourceType = "video";
+    }
+
+    try {
+      await cloudinary.uploader.destroy(file.publicId, {
+        resource_type: resourceType,
+        type: "upload",
+        invalidate: true,
+      });
+    } catch (error) {
+      console.error(
+        `Cloudinary deletion failed for ${file.publicId}:`,
+        error.message,
+      );
+    }
+  }
+
+  const folderMap = new Map(subtree.map((item) => [item.id, item]));
+
+  const foldersByDepth = [...subtree].sort(
+    (a, b) => getFolderDepth(b, folderMap) - getFolderDepth(a, folderMap),
+  );
+
+  await prisma.$transaction(async (tx) => {
+    await tx.file.deleteMany({
+      where: {
+        ownerId,
+        folderId: {
+          in: folderIds,
+        },
+      },
+    });
+
+    for (const currentFolder of foldersByDepth) {
+      await tx.folder.delete({
+        where: {
+          id: currentFolder.id,
+        },
+      });
+    }
   });
 
   return {
     success: true,
     message: "Folder permanently deleted.",
+    folderIds,
+    fileIds: files.map((file) => file.id),
   };
 };
 
@@ -238,6 +437,10 @@ export const toggleFolderFavoriteService = async (folderId, ownerId) => {
       403,
       "You do not have permission to modify this folder.",
     );
+  }
+
+  if (folder.isTrashed) {
+    throw new ApiError(400, "Cannot modify a trashed folder.");
   }
 
   const updatedFolder = await prisma.folder.update({
@@ -291,11 +494,43 @@ export const getFolderContentsService = async (folderId, ownerId) => {
     throw new ApiError(403, "You are not allowed to access this folder");
   }
 
+  if (folder.isTrashed) {
+    throw new ApiError(404, "Folder not found");
+  }
+
+  const breadcrumb = [{ label: "Home", path: "/" }];
+  let currentParentId = folder.parentId;
+
+  while (currentParentId) {
+    const parentFolder = await prisma.folder.findUnique({
+      where: {
+        id: currentParentId,
+      },
+    });
+
+    if (!parentFolder) break;
+
+    breadcrumb.splice(1, 0, {
+      label: parentFolder.name,
+      path: `/folder/${parentFolder.id}`,
+    });
+
+    currentParentId = parentFolder.parentId;
+  }
+
+  breadcrumb.push({
+    label: folder.name,
+    path: null,
+  });
+
   const { children, files, ...folderData } = folder;
 
   return {
     success: true,
-    folder: folderData,
+    folder: {
+      ...folderData,
+      breadcrumb,
+    },
     folders: children,
     files: files.map((file) => ({
       ...file,

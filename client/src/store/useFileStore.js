@@ -83,6 +83,35 @@ const useFileStore = create((set) => ({
     set((state) => ({
       files: state.files.filter((file) => file.id !== id),
     })),
+
+  permanentlyDeleteFiles: (ids) =>
+    set((state) => ({
+      files: state.files.filter((file) => !ids.includes(file.id)),
+    })),
+
+  restoreFiles: (ids) =>
+    set((state) => ({
+      files: state.files.map((file) =>
+        ids.includes(file.id)
+          ? {
+              ...file,
+              isTrashed: false,
+            }
+          : file,
+      ),
+    })),
+
+  moveFilesToTrash: (ids) =>
+    set((state) => ({
+      files: state.files.map((file) =>
+        ids.includes(file.id)
+          ? {
+              ...file,
+              isTrashed: true,
+            }
+          : file,
+      ),
+    })),
 }));
 
 export default useFileStore;

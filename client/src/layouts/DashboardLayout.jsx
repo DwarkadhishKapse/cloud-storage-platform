@@ -18,6 +18,10 @@ const DashboardLayout = () => {
 
   const currentFolderId = folderMatch ? folderMatch[1] : null;
 
+  const handleFolderCreated = () => {
+    setFolderRefreshKey((prev) => prev + 1);
+  };
+
   const handleFileUpload = () => {
     setFolderRefreshKey((prev) => prev + 1);
   };
@@ -45,6 +49,7 @@ const DashboardLayout = () => {
         isOpen={isCreateFolderOpen}
         onClose={() => setIsCreateFolderOpen(false)}
         parentId={currentFolderId}
+        onFolderCreated={handleFolderCreated}
       />
 
       <UploadFileModal

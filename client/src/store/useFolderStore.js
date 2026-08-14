@@ -38,9 +38,16 @@ const useFolderStore = create((set) => ({
 
       set((state) => ({
         folders: state.folders.map((folder) =>
-          folder.id === id ? response.folder : folder,
+          response.folderIds.includes(folder.id)
+            ? {
+                ...folder,
+                isTrashed: true,
+              }
+            : folder,
         ),
       }));
+
+      return response;
     } catch (error) {
       console.error("Failed to move folder to trash:", error);
       throw error;
@@ -53,9 +60,16 @@ const useFolderStore = create((set) => ({
 
       set((state) => ({
         folders: state.folders.map((folder) =>
-          folder.id === id ? response.folder : folder,
+          response.folderIds.includes(folder.id)
+            ? {
+                ...folder,
+                isTrashed: false,
+              }
+            : folder,
         ),
       }));
+
+      return response;
     } catch (error) {
       console.error("Failed to restore folder:", error);
       throw error;
@@ -64,14 +78,17 @@ const useFolderStore = create((set) => ({
 
   permanentlyDeleteFolder: async (id) => {
     try {
-      await permanentlyDeleteFolder(id);
+      const response = await permanentlyDeleteFolder(id);
 
       set((state) => ({
-        folders: state.folders.filter((folder) => folder.id !== id),
+        folders: state.folders.filter(
+          (folder) => !response.folderIds.includes(folder.id),
+        ),
       }));
+
+      return response;
     } catch (error) {
       console.error("Failed to permanently delete folder:", error);
-
       throw error;
     }
   },
@@ -92,9 +109,10 @@ const useFolderStore = create((set) => ({
           folder.id === id ? response.folder : folder,
         ),
       }));
+
+      return response.folder;
     } catch (error) {
       console.error("Failed to toggle folder favorite:", error);
-
       throw error;
     }
   },
