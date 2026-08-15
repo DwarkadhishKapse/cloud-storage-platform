@@ -7,6 +7,17 @@ datasource db {
   provider = "postgresql"
 }
 
+enum ShareLinkAccess {
+  RESTRICTED
+  ANYONE
+}
+
+enum ShareRole {
+  VIEWER
+  COMMENTER
+  EDITOR
+}
+
 model User {
   id          String    @id @default(uuid()) @db.Uuid
   username    String    @unique @db.VarChar(50)
@@ -20,8 +31,12 @@ model User {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  folders   Folder[]
-  files     File[]
+
+  folders Folder[]
+  files   File[]
+
+  fileShares   FileShare[]
+  folderShares FolderShare[]
 }
 
 model Folder {
@@ -30,6 +45,9 @@ model Folder {
 
   isFavorite Boolean @default(false)
   isTrashed  Boolean @default(false)
+
+  shareToken String?         @unique
+  linkAccess ShareLinkAccess @default(RESTRICTED)
 
   parentId String?  @db.Uuid
   parent   Folder?  @relation("FolderHierarchy", fields: [parentId], references: [id])
@@ -43,26 +61,74 @@ model Folder {
 
   files File[]
 
+  shares FolderShare[]
+
   @@index([ownerId])
 }
 
 model File {
-  id         String  @id @default(uuid()) @db.Uuid
-  name       String  @db.VarChar(255)
-  publicId   String  @unique
-  url        String
-  mimeType   String
-  size       BigInt
+  id       String @id @default(uuid()) @db.Uuid
+  name     String @db.VarChar(255)
+  publicId String @unique
+  url      String
+  mimeType String
+  size     BigInt
+
   isFavorite Boolean @default(false)
   isTrashed  Boolean @default(false)
-  ownerId    String  @db.Uuid
-  owner      User    @relation(fields: [ownerId], references: [id], onDelete: Cascade)
 
-  folderId  String?  @db.Uuid
-  folder    Folder?  @relation(fields: [folderId], references: [id], onDelete: SetNull)
+  shareToken String?         @unique
+  linkAccess ShareLinkAccess @default(RESTRICTED)
+
+  ownerId String @db.Uuid
+  owner   User   @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+
+  folderId String? @db.Uuid
+  folder   Folder? @relation(fields: [folderId], references: [id], onDelete: SetNull)
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  shares FileShare[]
+
   @@index([ownerId])
+  @@index([folderId])
+}
+
+model FileShare {
+  id String @id @default(uuid()) @db.Uuid
+
+  fileId String @db.Uuid
+  file   File   @relation(fields: [fileId], references: [id], onDelete: Cascade)
+
+  userId String @db.Uuid
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  role ShareRole @default(VIEWER)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([fileId, userId])
+  @@index([userId])
+  @@index([fileId])
+}
+
+model FolderShare {
+  id String @id @default(uuid()) @db.Uuid
+
+  folderId String @db.Uuid
+  folder   Folder @relation(fields: [folderId], references: [id], onDelete: Cascade)
+
+  userId String @db.Uuid
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  role ShareRole @default(VIEWER)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([folderId, userId])
+  @@index([userId])
   @@index([folderId])
 }
