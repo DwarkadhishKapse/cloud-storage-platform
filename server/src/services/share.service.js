@@ -293,6 +293,80 @@ export const addFileShareService = async (
   };
 };
 
+export const addFolderShareService = async (
+  folderId,
+  ownerId,
+  email,
+  role = "VIEWER",
+) => {
+  const folder = await prisma.folder.findUnique({
+    where: {
+      id: folderId,
+    },
+  });
+
+  if (!folder) {
+    throw new ApiError(404, "Folder not found.");
+  }
+
+  if (folder.ownerId !== ownerId) {
+    throw new ApiError(403, "You do not have permission to share this folder.");
+  }
+
+  if (folder.isTrashed) {
+    throw new ApiError(400, "Cannot share a folder in trash.");
+  }
+
+  if (!["VIEWER", "COMMENTER", "EDITOR"].includes(role)) {
+    throw new ApiError(400, "Invalid sharing role.");
+  }
+
+  const user = await getUserForSharing(email);
+
+  if (user.id === ownerId) {
+    throw new ApiError(400, "The owner already has access to this folder.");
+  }
+
+  const share = await prisma.folderShare.upsert({
+    where: {
+      folderId_userId: {
+        folderId,
+        userId: user.id,
+      },
+    },
+    update: {
+      role,
+    },
+    create: {
+      folderId,
+      userId: user.id,
+      role,
+    },
+    include: {
+      user: {
+        select: {
+          id: true,
+          username: true,
+          email: true,
+          firstName: true,
+          lastName: true,
+        },
+      },
+    },
+  });
+
+  return {
+    success: true,
+    message: "Folder access updated successfully.",
+    share: {
+      user: getShareUserData(share.user),
+      role: share.role,
+      createdAt: share.createdAt,
+      updatedAt: share.updatedAt,
+    },
+  };
+};
+
 export const removeFileShareService = async (fileId, ownerId, userId) => {
   const file = await prisma.file.findUnique({
     where: {
@@ -423,7 +497,7 @@ export const updateFileGeneralAccessService = async (
       shareToken:
         linkAccess === "ANYONE"
           ? file.shareToken || generateShareToken()
-          : file.shareToken,
+          : null,
     },
   });
 
@@ -480,7 +554,7 @@ export const updateFolderGeneralAccessService = async (
       shareToken:
         linkAccess === "ANYONE"
           ? folder.shareToken || generateShareToken()
-          : folder.shareToken,
+          : null,
     },
   });
 
