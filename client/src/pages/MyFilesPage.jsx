@@ -13,6 +13,7 @@ import RenameFolderModal from "../components/RenameFolderModal";
 import DeleteFileModal from "../components/DeleteFileModal";
 import PreviewFileModal from "../components/PreviewFileModal";
 import FileDetailsPanel from "../components/FileDetailsPanel";
+import ShareModal from "../components/ShareModal";
 
 import { formatFileSize } from "../utils/formatFileSize";
 import { downloadFile } from "../utils/downloadFile";
@@ -55,6 +56,7 @@ const MyFilesPage = () => {
   const [folderToEdit, setFolderToEdit] = useState(null);
   const [fileToDelete, setFileToDelete] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [itemToShare, setItemToShare] = useState(null);
 
   const normalizedQuery = searchQuery.toLowerCase().trim();
 
@@ -164,6 +166,12 @@ const MyFilesPage = () => {
                 onFavorite={() => toggleFolderFavorite(folder.id)}
                 onEdit={() => setFolderToEdit(folder)}
                 onDelete={() => setFolderToDelete(folder)}
+                onShare={() =>
+                  setItemToShare({
+                    item: folder,
+                    type: "folder",
+                  })
+                }
               />
             ))}
           </div>
@@ -192,6 +200,12 @@ const MyFilesPage = () => {
                 onDownload={() => downloadFile(file)}
                 onDelete={() => setFileToDelete(file)}
                 onDetail={() => setDetailFile(file)}
+                onShare={() =>
+                  setItemToShare({
+                    item: file,
+                    type: "file",
+                  })
+                }
               />
             ))}
           </div>
@@ -229,6 +243,12 @@ const MyFilesPage = () => {
       <PreviewFileModal file={previewFile} onClose={closePreview} />
 
       <FileDetailsPanel file={detailFile} onClose={closeDetail} />
+
+      <ShareModal
+        item={itemToShare?.item}
+        type={itemToShare?.type}
+        onClose={() => setItemToShare(null)}
+      />
     </div>
   );
 };

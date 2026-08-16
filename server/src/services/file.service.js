@@ -82,20 +82,44 @@ export const uploadFileService = async (file, body, ownerId) => {
   };
 };
 
-export const getFilesService = async (ownerId) => {
+export const getFilesService = async (userId) => {
   const files = await prisma.file.findMany({
     where: {
-      ownerId,
       isTrashed: false,
+    },
+    include: {
+      owner: {
+        select: {
+          id: true,
+          username: true,
+          email: true,
+          firstName: true,
+          lastName: true,
+        },
+      },
+      shares: {
+        where: {
+          userId,
+        },
+        select: {
+          role: true,
+        },
+      },
     },
     orderBy: {
       createdAt: "desc",
     },
   });
 
+  const accessibleFiles = files.filter((file) => {
+    if (file.ownerId === userId) return true;
+    if (file.shares.length > 0) return true;
+    return false;
+  });
+
   return {
     success: true,
-    files: files.map((file) => ({
+    files: accessibleFiles.map((file) => ({
       ...file,
       size: Number(file.size),
     })),
@@ -168,10 +192,17 @@ export const toggleFileFavoriteService = async (fileId, ownerId) => {
   };
 };
 
-export const getFileForDownloadService = async (fileId, ownerId) => {
+export const getFileForDownloadService = async (fileId, userId) => {
   const file = await prisma.file.findUnique({
     where: {
       id: fileId,
+    },
+    include: {
+      shares: {
+        where: {
+          userId,
+        },
+      },
     },
   });
 
@@ -179,16 +210,19 @@ export const getFileForDownloadService = async (fileId, ownerId) => {
     throw new ApiError(404, "File not found");
   }
 
-  if (file.ownerId !== ownerId) {
-    throw new ApiError(403, "You do not have permission to download this file");
-  }
-
   if (file.isTrashed) {
     throw new ApiError(400, "This file is in trash");
   }
 
+  const isOwner = file.ownerId === userId;
+  const hasShare = file.shares.length > 0;
+
+  if (!isOwner && !hasShare) {
+    throw new ApiError(403, "You do not have permission to download this file");
+  }
+
   return file;
-};
+}
 
 export const getTrashedFilesService = async (ownerId) => {
   const files = await prisma.file.findMany({

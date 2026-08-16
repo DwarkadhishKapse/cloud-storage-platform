@@ -9,6 +9,7 @@ import RenameFolderModal from "../components/RenameFolderModal";
 import PreviewFileModal from "../components/PreviewFileModal";
 import DeleteFileModal from "../components/DeleteFileModal";
 import FileDetailsPanel from "../components/FileDetailsPanel";
+import ShareModal from "../components/ShareModal";
 import { formatFileSize } from "../utils/formatFileSize";
 import { downloadFile } from "../utils/downloadFile";
 import { getFiles } from "../services/file.service";
@@ -42,6 +43,7 @@ const FavoritesPage = () => {
   const [folderToEdit, setFolderToEdit] = useState(null);
   const [fileToDelete, setFileToDelete] = useState(null);
   const [loadingFiles, setLoadingFiles] = useState(true);
+  const [itemToShare, setItemToShare] = useState(null);
 
   useEffect(() => {
     const fetchFavoritesData = async () => {
@@ -115,6 +117,12 @@ const FavoritesPage = () => {
                 onDelete={() => {
                   setFolderToDelete(folder);
                 }}
+                onShare={() =>
+                  setItemToShare({
+                    item: folder,
+                    type: "folder",
+                  })
+                }
               />
             ))}
           </div>
@@ -137,6 +145,12 @@ const FavoritesPage = () => {
                 onDetail={() => setDetailFile(file)}
                 onDelete={() => setFileToDelete(file)}
                 onDownload={() => downloadFile(file)}
+                onShare={() =>
+                  setItemToShare({
+                    item: file,
+                    type: "file",
+                  })
+                }
               />
             ))}
           </div>
@@ -146,6 +160,12 @@ const FavoritesPage = () => {
       <PreviewFileModal file={previewFile} onClose={closePreview} />
 
       <FileDetailsPanel file={detailFile} onClose={closeDetail} />
+
+      <ShareModal
+        item={itemToShare?.item}
+        type={itemToShare?.type}
+        onClose={() => setItemToShare(null)}
+      />
 
       <DeleteFolderModal
         folder={folderToDelete}

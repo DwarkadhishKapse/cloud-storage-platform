@@ -104,21 +104,45 @@ export const createFolderService = async (folderData, ownerId) => {
   };
 };
 
-export const getFoldersService = async (ownerId) => {
+export const getFoldersService = async (userId) => {
   const folders = await prisma.folder.findMany({
     where: {
-      ownerId,
       parentId: null,
       isTrashed: false,
+    },
+    include: {
+      owner: {
+        select: {
+          id: true,
+          username: true,
+          email: true,
+          firstName: true,
+          lastName: true,
+        },
+      },
+      shares: {
+        where: {
+          userId,
+        },
+        select: {
+          role: true,
+        },
+      },
     },
     orderBy: {
       createdAt: "desc",
     },
   });
 
+  const accessibleFolders = folders.filter((folder) => {
+    if (folder.ownerId === userId) return true;
+    if (folder.shares.length > 0) return true;
+    return false;
+  });
+
   return {
     success: true,
-    folders,
+    folders: accessibleFolders,
   };
 };
 
@@ -461,12 +485,20 @@ export const toggleFolderFavoriteService = async (folderId, ownerId) => {
   };
 };
 
-export const getFolderContentsService = async (folderId, ownerId) => {
+export const getFolderContentsService = async (folderId, userId) => {
   const folder = await prisma.folder.findUnique({
     where: {
       id: folderId,
     },
     include: {
+      shares: {
+        where: {
+          userId,
+        },
+        select: {
+          role: true,
+        },
+      },
       children: {
         where: {
           isTrashed: false,
@@ -490,12 +522,15 @@ export const getFolderContentsService = async (folderId, ownerId) => {
     throw new ApiError(404, "Folder not found");
   }
 
-  if (folder.ownerId !== ownerId) {
-    throw new ApiError(403, "You are not allowed to access this folder");
-  }
-
   if (folder.isTrashed) {
     throw new ApiError(404, "Folder not found");
+  }
+
+  const isOwner = folder.ownerId === userId;
+  const hasAccess = folder.shares.length > 0;
+
+  if (!isOwner && !hasAccess) {
+    throw new ApiError(403, "You are not allowed to access this folder");
   }
 
   const breadcrumb = [{ label: "Home", path: "/" }];

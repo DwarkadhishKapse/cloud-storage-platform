@@ -189,6 +189,12 @@ const DashboardPage = () => {
                 onDownload={() => downloadFile(file)}
                 onDelete={() => setFileToDelete(file)}
                 onDetail={() => setDetailFile(file)}
+                onShare={() =>
+                  setItemToShare({
+                    item: file,
+                    type: "file",
+                  })
+                }
               />
             ))}
           </div>

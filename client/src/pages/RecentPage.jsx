@@ -4,6 +4,7 @@ import FileCard from "../components/FileCard";
 import PreviewFileModal from "../components/PreviewFileModal";
 import DeleteFileModal from "../components/DeleteFileModal";
 import FileDetailsPanel from "../components/FileDetailsPanel";
+import ShareModal from "../components/ShareModal";
 
 import useFileStore from "../store/useFileStore";
 
@@ -31,6 +32,7 @@ const RecentPage = () => {
 
   const [fileToDelete, setFileToDelete] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [itemToShare, setItemToShare] = useState(null);
 
   useEffect(() => {
     const fetchRecentFiles = async () => {
@@ -102,6 +104,12 @@ const RecentPage = () => {
             onDetail={() => setDetailFile(file)}
             onDelete={() => setFileToDelete(file)}
             onDownload={() => downloadFile(file)}
+            onShare={() =>
+              setItemToShare({
+                item: file,
+                type: "file",
+              })
+            }
           />
         ))}
       </div>
@@ -109,6 +117,12 @@ const RecentPage = () => {
       <PreviewFileModal file={previewFile} onClose={closePreview} />
 
       <FileDetailsPanel file={detailFile} onClose={closeDetail} />
+
+      <ShareModal
+        item={itemToShare?.item}
+        type={itemToShare?.type}
+        onClose={() => setItemToShare(null)}
+      />
 
       <DeleteFileModal
         file={fileToDelete}
