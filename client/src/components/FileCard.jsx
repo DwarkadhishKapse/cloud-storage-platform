@@ -11,13 +11,14 @@ const FileCard = ({
   onDelete,
   onDownload,
   onDetail,
+  onShare,
 }) => {
   return (
     <div
       onClick={onClick}
       className="flex cursor-pointer items-center justify-between rounded-2xl border border-slate-200 bg-white p-5 transition-all duration-200 hover:border-emerald-300 hover:shadow-md"
     >
-      <div className="flex items-center gap-4 min-w-0">
+      <div className="flex min-w-0 items-center gap-4">
         <FiFileText size={28} className="text-emerald-600" />
 
         <div className="min-w-0">
@@ -32,6 +33,7 @@ const FileCard = ({
         onDownload={onDownload}
         onDelete={onDelete}
         onDetail={onDetail}
+        onShare={onShare}
       />
     </div>
   );

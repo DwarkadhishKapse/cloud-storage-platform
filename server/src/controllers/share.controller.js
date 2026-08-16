@@ -7,6 +7,8 @@ import {
   addFolderShareService,
   removeFileShareService,
   removeFolderShareService,
+  updateFileShareRoleService,
+  updateFolderShareRoleService,
   updateFileGeneralAccessService,
   updateFolderGeneralAccessService,
 } from "../services/share.service.js";
@@ -48,6 +50,32 @@ export const addFolderShare = asyncHandler(async (req, res) => {
     req.params.id,
     req.user.id,
     email,
+    role,
+  );
+
+  return res.status(200).json(result);
+});
+
+export const updateFileShareRole = asyncHandler(async (req, res) => {
+  const { role } = req.body;
+
+  const result = await updateFileShareRoleService(
+    req.params.id,
+    req.user.id,
+    req.params.userId,
+    role,
+  );
+
+  return res.status(200).json(result);
+});
+
+export const updateFolderShareRole = asyncHandler(async (req, res) => {
+  const { role } = req.body;
+
+  const result = await updateFolderShareRoleService(
+    req.params.id,
+    req.user.id,
+    req.params.userId,
     role,
   );
 

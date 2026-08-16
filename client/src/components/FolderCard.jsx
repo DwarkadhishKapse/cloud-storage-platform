@@ -9,6 +9,7 @@ const FolderCard = ({
   onEdit,
   onFavorite,
   onDetail,
+  onShare,
 }) => {
   return (
     <div
@@ -17,6 +18,7 @@ const FolderCard = ({
     >
       <div className="flex min-w-0 items-center gap-4">
         <FiFolder size={28} className="shrink-0 text-emerald-600" />
+
         <h3 className="truncate font-semibold text-slate-800">{name}</h3>
       </div>
 
@@ -24,6 +26,7 @@ const FolderCard = ({
         isFavorite={isFavorite}
         onFavorite={onFavorite}
         onEdit={onEdit}
+        onShare={onShare}
         onDelete={onDelete}
         onDetail={onDetail}
       />

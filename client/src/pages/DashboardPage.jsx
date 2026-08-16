@@ -12,6 +12,7 @@ import FileDetailsPanel from "../components/FileDetailsPanel";
 import FolderDetailsPanel from "../components/FolderDetailsPanel";
 import { getFiles, moveFileToTrash } from "../services/file.service";
 import { getFolders } from "../services/folder.service";
+import ShareModal from "../components/ShareModal";
 
 import useViewStore from "../store/useViewStore";
 import useFolderStore from "../store/useFolderStore";
@@ -32,6 +33,7 @@ const DashboardPage = () => {
   const [folderToEdit, setFolderToEdit] = useState(null);
   const [fileToDelete, setFileToDelete] = useState(null);
   const [loadingFiles, setLoadingFiles] = useState(true);
+  const [itemToShare, setItemToShare] = useState(null);
 
   const {
     files,
@@ -153,6 +155,12 @@ const DashboardPage = () => {
                 onEdit={() => setFolderToEdit(folder)}
                 onFavorite={() => toggleFolderFavorite(folder.id)}
                 onDetail={() => setDetailFolder(folder)}
+                onShare={() =>
+                  setItemToShare({
+                    item: folder,
+                    type: "folder",
+                  })
+                }
               />
             ))}
           </div>
@@ -220,6 +228,12 @@ const DashboardPage = () => {
       <PreviewFileModal file={previewFile} onClose={closePreview} />
 
       <FileDetailsPanel file={detailFile} onClose={closeDetail} />
+
+      <ShareModal
+        item={itemToShare?.item}
+        type={itemToShare?.type}
+        onClose={() => setItemToShare(null)}
+      />
     </div>
   );
 };

@@ -571,3 +571,161 @@ export const updateFolderGeneralAccessService = async (
     shareToken: updatedFolder.shareToken,
   };
 };
+
+export const updateFileShareRoleService = async (
+  fileId,
+  ownerId,
+  userId,
+  role,
+) => {
+  const file = await prisma.file.findUnique({
+    where: {
+      id: fileId,
+    },
+  });
+
+  if (!file) {
+    throw new ApiError(404, "File not found.");
+  }
+
+  if (file.ownerId !== ownerId) {
+    throw new ApiError(
+      403,
+      "You do not have permission to manage sharing for this file.",
+    );
+  }
+
+  if (file.isTrashed) {
+    throw new ApiError(400, "Cannot change sharing for a file in trash.");
+  }
+
+  if (!["VIEWER", "COMMENTER", "EDITOR"].includes(role)) {
+    throw new ApiError(400, "Invalid sharing role.");
+  }
+
+  const share = await prisma.fileShare.findUnique({
+    where: {
+      fileId_userId: {
+        fileId,
+        userId,
+      },
+    },
+  });
+
+  if (!share) {
+    throw new ApiError(404, "File share not found.");
+  }
+
+  const updatedShare = await prisma.fileShare.update({
+    where: {
+      fileId_userId: {
+        fileId,
+        userId,
+      },
+    },
+    data: {
+      role,
+    },
+    include: {
+      user: {
+        select: {
+          id: true,
+          username: true,
+          email: true,
+          firstName: true,
+          lastName: true,
+        },
+      },
+    },
+  });
+
+  return {
+    success: true,
+    message: "File access role updated successfully.",
+    share: {
+      user: updatedShare.user,
+      role: updatedShare.role,
+      createdAt: updatedShare.createdAt,
+      updatedAt: updatedShare.updatedAt,
+    },
+  };
+};
+
+export const updateFolderShareRoleService = async (
+  folderId,
+  ownerId,
+  userId,
+  role,
+) => {
+  const folder = await prisma.folder.findUnique({
+    where: {
+      id: folderId,
+    },
+  });
+
+  if (!folder) {
+    throw new ApiError(404, "Folder not found.");
+  }
+
+  if (folder.ownerId !== ownerId) {
+    throw new ApiError(
+      403,
+      "You do not have permission to manage sharing for this folder.",
+    );
+  }
+
+  if (folder.isTrashed) {
+    throw new ApiError(400, "Cannot change sharing for a folder in trash.");
+  }
+
+  if (!["VIEWER", "COMMENTER", "EDITOR"].includes(role)) {
+    throw new ApiError(400, "Invalid sharing role.");
+  }
+
+  const share = await prisma.folderShare.findUnique({
+    where: {
+      folderId_userId: {
+        folderId,
+        userId,
+      },
+    },
+  });
+
+  if (!share) {
+    throw new ApiError(404, "Folder share not found.");
+  }
+
+  const updatedShare = await prisma.folderShare.update({
+    where: {
+      folderId_userId: {
+        folderId,
+        userId,
+      },
+    },
+    data: {
+      role,
+    },
+    include: {
+      user: {
+        select: {
+          id: true,
+          username: true,
+          email: true,
+          firstName: true,
+          lastName: true,
+        },
+      },
+    },
+  });
+
+  return {
+    success: true,
+    message: "Folder access role updated successfully.",
+    share: {
+      user: updatedShare.user,
+      role: updatedShare.role,
+      createdAt: updatedShare.createdAt,
+      updatedAt: updatedShare.updatedAt,
+    },
+  };
+};

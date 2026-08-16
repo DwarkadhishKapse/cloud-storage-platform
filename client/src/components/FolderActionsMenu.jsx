@@ -27,6 +27,7 @@ const FolderActionsMenu = ({
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
+
   return (
     <div ref={menuRef} className="relative">
       <button
@@ -42,7 +43,7 @@ const FolderActionsMenu = ({
       {isOpen && (
         <div
           onClick={(e) => e.stopPropagation()}
-          className="absolute right-0 top-12 z-10 w-52 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xl"
+          className="absolute right-0 top-12 z-20 w-52 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xl"
         >
           <button
             onClick={() => {
@@ -56,6 +57,7 @@ const FolderActionsMenu = ({
             ) : (
               <FaRegStar className="text-slate-400" />
             )}
+
             <span>
               {isFavorite ? "Remove from Favorites" : "Add to Favorites"}
             </span>
@@ -68,7 +70,7 @@ const FolderActionsMenu = ({
             }}
             className="flex w-full items-center gap-3 px-4 py-3 text-left text-slate-700 transition-colors hover:bg-slate-50"
           >
-            <FiEdit2 />
+            <FiEdit2 className="text-slate-500" />
             <span>Rename</span>
           </button>
 
@@ -79,7 +81,7 @@ const FolderActionsMenu = ({
             }}
             className="flex w-full items-center gap-3 px-4 py-3 text-left text-slate-700 transition-colors hover:bg-slate-50"
           >
-            <FaInfoCircle />
+            <FaInfoCircle className="text-slate-500" />
             <span>View Details</span>
           </button>
 
@@ -88,10 +90,10 @@ const FolderActionsMenu = ({
               onShare?.();
               setIsOpen(false);
             }}
-            className="flex w-full items-center gap-3 px-4 py-3 text-left text-slate-400 transition-colors hover:bg-slate-50"
+            className="flex w-full items-center gap-3 px-4 py-3 text-left text-slate-700 transition-colors hover:bg-emerald-50 hover:text-emerald-700"
           >
-            <FiShare2 />
-            <span>Share (Coming Soon)</span>
+            <FiShare2 className="text-emerald-600" />
+            <span>Share</span>
           </button>
 
           <div className="mx-3 border-t border-slate-100" />

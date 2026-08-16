@@ -88,10 +88,10 @@ const FileActionsMenu = ({
               onShare?.();
               setIsOpen(false);
             }}
-            className="flex w-full items-center gap-3 px-4 py-3 text-left text-slate-400 transition-colors hover:bg-slate-50"
+            className="flex w-full items-center gap-3 px-4 py-3 text-left text-slate-700 transition-colors hover:bg-slate-50"
           >
             <FiShare2 />
-            <span>Share (Coming Soon)</span>
+            <span>Share</span>
           </button>
 
           <div className="mx-3 border-t border-slate-100" />

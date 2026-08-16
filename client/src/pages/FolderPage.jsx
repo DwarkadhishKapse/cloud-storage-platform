@@ -10,6 +10,7 @@ import DeleteFileModal from "../components/DeleteFileModal";
 import DeleteFolderModal from "../components/DeleteFolderModal";
 import useFileStore from "../store/useFileStore";
 import useFolderStore from "../store/useFolderStore";
+import ShareModal from "../components/ShareModal";
 
 import { getFolderContents } from "../services/folder.service";
 import { moveFileToTrash } from "../services/file.service";
@@ -33,6 +34,7 @@ const FolderPage = () => {
   const [detailFile, setDetailFile] = useState(null);
   const [fileToDelete, setFileToDelete] = useState(null);
   const [folderToDelete, setFolderToDelete] = useState(null);
+  const [itemToShare, setItemToShare] = useState(null);
 
   const { moveToTrash } = useFolderStore();
 
@@ -98,7 +100,9 @@ const FolderPage = () => {
     try {
       await moveToTrash(folderToDelete.id);
       setFolders((currentFolders) =>
-        currentFolders.filter((folderItem) => folderItem.id !== folderToDelete.id),
+        currentFolders.filter(
+          (folderItem) => folderItem.id !== folderToDelete.id,
+        ),
       );
       setFolderToDelete(null);
       navigate(-1);
@@ -142,6 +146,12 @@ const FolderPage = () => {
                 isFavorite={childFolder.isFavorite}
                 onClick={() => navigate(`/folder/${childFolder.id}`)}
                 onDelete={() => setFolderToDelete(childFolder)}
+                onShare={() =>
+                  setItemToShare({
+                    item: childFolder,
+                    type: "folder",
+                  })
+                }
               />
             ))}
           </div>
@@ -164,6 +174,12 @@ const FolderPage = () => {
                 onDownload={() => downloadFile(file)}
                 onDelete={() => setFileToDelete(file)}
                 onDetail={() => setDetailFile(file)}
+                onShare={() =>
+                  setItemToShare({
+                    item: file,
+                    type: "file",
+                  })
+                }
               />
             ))}
           </div>
@@ -182,6 +198,12 @@ const FolderPage = () => {
       />
 
       <FileDetailsPanel file={detailFile} onClose={() => setDetailFile(null)} />
+
+      <ShareModal
+        item={itemToShare?.item}
+        type={itemToShare?.type}
+        onClose={() => setItemToShare(null)}
+      />
 
       <DeleteFolderModal
         folder={folderToDelete}

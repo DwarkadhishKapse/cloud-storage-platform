@@ -7,6 +7,8 @@ import {
   getFolderSharing,
   addFileShare,
   addFolderShare,
+  updateFileShareRole,
+  updateFolderShareRole,
   removeFileShare,
   removeFolderShare,
   updateFileGeneralAccess,
@@ -20,12 +22,14 @@ const router = Router();
 router.get("/files/:id", protect, getFileSharing);
 router.get("/files/:id/access", protect, getFileAccess);
 router.post("/files/:id", protect, addFileShare);
+router.patch("/files/:id/users/:userId", protect, updateFileShareRole);
 router.delete("/files/:id/users/:userId", protect, removeFileShare);
 router.patch("/files/:id/general", protect, updateFileGeneralAccess);
 
 router.get("/folders/:id", protect, getFolderSharing);
 router.get("/folders/:id/access", protect, getFolderAccess);
 router.post("/folders/:id", protect, addFolderShare);
+router.patch("/folders/:id/users/:userId", protect, updateFolderShareRole);
 router.delete("/folders/:id/users/:userId", protect, removeFolderShare);
 router.patch("/folders/:id/general", protect, updateFolderGeneralAccess);
 
