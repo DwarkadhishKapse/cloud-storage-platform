@@ -49,3 +49,9 @@ export const permanentlyDeleteFile = async (fileId) => {
 
   return response.data;
 };
+
+export const getSharedFilesWithMe = async () => {
+  const response = await api.get("/shares/shared-with-me/files");
+
+  return response.data;
+};

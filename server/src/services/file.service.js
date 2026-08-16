@@ -1,6 +1,7 @@
 import prisma from "../lib/prisma.js";
 import ApiError from "../utils/ApiError.js";
 import cloudinary from "../config/cloudinary.js";
+import { getFileAccessService } from "./access.service.js";
 
 export const uploadFileService = async (file, body, ownerId) => {
   if (!file) {
@@ -214,12 +215,7 @@ export const getFileForDownloadService = async (fileId, userId) => {
     throw new ApiError(400, "This file is in trash");
   }
 
-  const isOwner = file.ownerId === userId;
-  const hasShare = file.shares.length > 0;
-
-  if (!isOwner && !hasShare) {
-    throw new ApiError(403, "You do not have permission to download this file");
-  }
+  await getFileAccessService(fileId, userId);
 
   return file;
 }

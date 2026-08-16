@@ -44,68 +44,70 @@ const FileActionsMenu = ({
           onClick={(e) => e.stopPropagation()}
           className="absolute right-0 top-12 z-10 w-52 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xl"
         >
-          <button
-            onClick={() => {
-              onFavorite?.();
-              setIsOpen(false);
-            }}
-            className="flex w-full items-center gap-3 px-4 py-3 text-left text-slate-700 transition-colors hover:bg-slate-50"
-          >
-            {isFavorite ? (
-              <FaStar className="text-yellow-500" />
-            ) : (
-              <FaRegStar className="text-slate-400" />
-            )}
-            <span>
-              {isFavorite ? "Remove from Favorites" : "Add to Favorites"}
-            </span>
-          </button>
+          {onFavorite && (
+            <button
+              onClick={() => {
+                onFavorite();
+                setIsOpen(false);
+              }}
+              className="flex w-full items-center gap-3 px-4 py-3 text-left text-slate-700 transition-colors hover:bg-slate-50"
+            >
+              {isFavorite ? (
+                <FaStar className="text-yellow-500" />
+              ) : (
+                <FaRegStar className="text-slate-400" />
+              )}
+              <span>
+                {isFavorite ? "Remove from Favorites" : "Add to Favorites"}
+              </span>
+            </button>
+          )}
 
-          <button
+          {onDetail && <button
             onClick={() => {
-              onDetail?.();
+              onDetail();
               setIsOpen(false);
             }}
             className="flex w-full items-center gap-3 px-4 py-3 text-left text-slate-700 transition-colors hover:bg-slate-50"
           >
             <FaInfoCircle />
             <span>View Details</span>
-          </button>
+          </button>}
 
-          <button
+          {onDownload && <button
             onClick={() => {
-              onDownload?.();
+              onDownload();
               setIsOpen(false);
             }}
             className="flex w-full items-center gap-3 px-4 py-3 text-left text-slate-700 transition-colors hover:bg-slate-50"
           >
             <FiDownload />
             <span>Download</span>
-          </button>
+          </button>}
 
-          <button
+          {onShare && <button
             onClick={() => {
-              onShare?.();
+              onShare();
               setIsOpen(false);
             }}
             className="flex w-full items-center gap-3 px-4 py-3 text-left text-slate-700 transition-colors hover:bg-slate-50"
           >
             <FiShare2 />
             <span>Share</span>
-          </button>
+          </button>}
 
-          <div className="mx-3 border-t border-slate-100" />
+          {onDelete && <div className="mx-3 border-t border-slate-100" />}
 
-          <button
+          {onDelete && <button
             onClick={() => {
-              onDelete?.();
+              onDelete();
               setIsOpen(false);
             }}
             className="flex w-full items-center gap-3 px-4 py-3 text-left text-red-600 transition-colors hover:bg-red-50"
           >
             <FiTrash2 />
             <span>Move to Trash</span>
-          </button>
+          </button>}
         </div>
       )}
     </div>

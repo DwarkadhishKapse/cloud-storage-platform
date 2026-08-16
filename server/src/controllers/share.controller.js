@@ -11,6 +11,8 @@ import {
   updateFolderShareRoleService,
   updateFileGeneralAccessService,
   updateFolderGeneralAccessService,
+  getSharedFilesWithMeService,
+  getSharedFoldersWithMeService,
 } from "../services/share.service.js";
 
 import {
@@ -126,6 +128,24 @@ export const updateFolderGeneralAccess = asyncHandler(async (req, res) => {
   );
 
   return res.status(200).json(result);
+});
+
+export const getSharedFilesWithMe = asyncHandler(async (req, res) => {
+  const files = await getSharedFilesWithMeService(req.user.id);
+
+  return res.status(200).json({
+    success: true,
+    files,
+  });
+});
+
+export const getSharedFoldersWithMe = asyncHandler(async (req, res) => {
+  const folders = await getSharedFoldersWithMeService(req.user.id);
+
+  return res.status(200).json({
+    success: true,
+    folders,
+  });
 });
 
 export const getFileAccess = asyncHandler(async (req, res) => {

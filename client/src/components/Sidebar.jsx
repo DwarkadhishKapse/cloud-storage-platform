@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { FiFolder, FiClock, FiStar, FiTrash2 } from "react-icons/fi";
+import { FiFolder, FiClock, FiStar, FiTrash2, FiShare2 } from "react-icons/fi";
 import { NavLink } from "react-router-dom";
 
 const navItems = [
@@ -19,6 +19,12 @@ const navItems = [
     icon: FiStar,
     label: "Favorites",
     path: "/favorites",
+  },
+
+  {
+    icon: FiShare2,
+    label: "Shared with me",
+    path: "/shared-with-me",
   },
 
   {

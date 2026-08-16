@@ -45,9 +45,9 @@ const FolderActionsMenu = ({
           onClick={(e) => e.stopPropagation()}
           className="absolute right-0 top-12 z-20 w-52 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xl"
         >
-          <button
+          {onFavorite && <button
             onClick={() => {
-              onFavorite?.();
+              onFavorite();
               setIsOpen(false);
             }}
             className="flex w-full items-center gap-3 px-4 py-3 text-left text-slate-700 transition-colors hover:bg-slate-50"
@@ -61,53 +61,53 @@ const FolderActionsMenu = ({
             <span>
               {isFavorite ? "Remove from Favorites" : "Add to Favorites"}
             </span>
-          </button>
+          </button>}
 
-          <button
+          {onEdit && <button
             onClick={() => {
-              onEdit?.();
+              onEdit();
               setIsOpen(false);
             }}
             className="flex w-full items-center gap-3 px-4 py-3 text-left text-slate-700 transition-colors hover:bg-slate-50"
           >
             <FiEdit2 className="text-slate-500" />
             <span>Rename</span>
-          </button>
+          </button>}
 
-          <button
+          {onDetail && <button
             onClick={() => {
-              onDetail?.();
+              onDetail();
               setIsOpen(false);
             }}
             className="flex w-full items-center gap-3 px-4 py-3 text-left text-slate-700 transition-colors hover:bg-slate-50"
           >
             <FaInfoCircle className="text-slate-500" />
             <span>View Details</span>
-          </button>
+          </button>}
 
-          <button
+          {onShare && <button
             onClick={() => {
-              onShare?.();
+              onShare();
               setIsOpen(false);
             }}
             className="flex w-full items-center gap-3 px-4 py-3 text-left text-slate-700 transition-colors hover:bg-emerald-50 hover:text-emerald-700"
           >
             <FiShare2 className="text-emerald-600" />
             <span>Share</span>
-          </button>
+          </button>}
 
-          <div className="mx-3 border-t border-slate-100" />
+          {onDelete && <div className="mx-3 border-t border-slate-100" />}
 
-          <button
+          {onDelete && <button
             onClick={() => {
-              onDelete?.();
+              onDelete();
               setIsOpen(false);
             }}
             className="flex w-full items-center gap-3 px-4 py-3 text-left text-red-600 transition-colors hover:bg-red-50"
           >
             <FiTrash2 />
             <span>Move to Trash</span>
-          </button>
+          </button>}
         </div>
       )}
     </div>

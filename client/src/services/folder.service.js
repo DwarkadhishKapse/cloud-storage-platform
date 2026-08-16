@@ -38,6 +38,12 @@ export const getTrashedFolders = async () => {
   return response.data;
 };
 
+export const getSharedFoldersWithMe = async () => {
+  const response = await api.get("/shares/shared-with-me/folders");
+
+  return response.data;
+};
+
 export const restoreFolder = async (folderId) => {
   const response = await api.patch(`/folders/${folderId}/restore`);
 

@@ -12,6 +12,7 @@ import FolderPage from "../pages/FolderPage";
 import MyFilesPage from "../pages/MyFilesPage";
 import RecentPage from "../pages/RecentPage";
 import TrashPage from "../pages/TrashPage";
+import SharedWithMePage from "../pages/SharedWithMePage";
 
 import ProtectedRoute from "./ProtectedRoute";
 
@@ -29,6 +30,7 @@ const AppRoutes = () => {
           <Route path="/files" element={<MyFilesPage />} />
           <Route path="/recent" element={<RecentPage />} />
           <Route path="/favorites" element={<FavoritesPage />} />
+          <Route path="/shared-with-me" element={<SharedWithMePage />} />
           <Route path="/trash" element={<TrashPage />} />
           <Route path="/folder/:id" element={<FolderPage />} />
         </Route>

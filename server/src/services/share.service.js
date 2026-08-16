@@ -729,3 +729,93 @@ export const updateFolderShareRoleService = async (
     },
   };
 };
+
+export const getSharedFilesWithMeService = async (userId) => {
+  const sharedFiles = await prisma.fileShare.findMany({
+    where: {
+      userId,
+    },
+    include: {
+      file: {
+        select: {
+          id: true,
+          name: true,
+          size: true,
+          mimeType: true,
+          url: true,
+          publicId: true,
+          isFavorite: true,
+          isTrashed: true,
+          ownerId: true,
+          createdAt: true,
+          updatedAt: true,
+          owner: {
+            select: {
+              id: true,
+              username: true,
+              email: true,
+              firstName: true,
+              lastName: true,
+            },
+          },
+        },
+      },
+    },
+    orderBy: {
+      createdAt: "desc",
+    },
+  });
+
+  return sharedFiles
+    .filter((share) => !share.file.isTrashed)
+    .map((share) => ({
+      ...share.file,
+      size: Number(share.file.size),
+      sharedByUser: share.file.owner,
+      shareRole: share.role,
+      sharedAt: share.createdAt,
+    }));
+};
+
+export const getSharedFoldersWithMeService = async (userId) => {
+  const sharedFolders = await prisma.folderShare.findMany({
+    where: {
+      userId,
+    },
+    include: {
+      folder: {
+        select: {
+          id: true,
+          name: true,
+          parentId: true,
+          ownerId: true,
+          isFavorite: true,
+          isTrashed: true,
+          createdAt: true,
+          updatedAt: true,
+          owner: {
+            select: {
+              id: true,
+              username: true,
+              email: true,
+              firstName: true,
+              lastName: true,
+            },
+          },
+        },
+      },
+    },
+    orderBy: {
+      createdAt: "desc",
+    },
+  });
+
+  return sharedFolders
+    .filter((share) => !share.folder.isTrashed)
+    .map((share) => ({
+      ...share.folder,
+      sharedByUser: share.folder.owner,
+      shareRole: share.role,
+      sharedAt: share.createdAt,
+    }));
+};

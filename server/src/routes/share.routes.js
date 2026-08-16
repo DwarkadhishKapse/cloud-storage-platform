@@ -17,12 +17,17 @@ import {
   getFolderAccess,
   getPublicFileAccess,
   getPublicFolderAccess,
+  getSharedFilesWithMe,
+  getSharedFoldersWithMe,
 } from "../controllers/share.controller.js";
 
 const router = Router();
 
 router.get("/public/files/:shareToken", getPublicFileAccess);
 router.get("/public/folders/:shareToken", getPublicFolderAccess);
+
+router.get("/shared-with-me/files", protect, getSharedFilesWithMe);
+router.get("/shared-with-me/folders", protect, getSharedFoldersWithMe);
 
 router.get("/files/:id", protect, getFileSharing);
 router.get("/files/:id/access", protect, getFileAccess);

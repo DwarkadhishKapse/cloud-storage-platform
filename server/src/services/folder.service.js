@@ -1,6 +1,7 @@
 import prisma from "../lib/prisma.js";
 import ApiError from "../utils/ApiError.js";
 import cloudinary from "../config/cloudinary.js";
+import { getFolderAccessService } from "./access.service.js";
 
 const getFolderSubtree = async (folderId, ownerId) => {
   const folders = await prisma.folder.findMany({
@@ -526,12 +527,7 @@ export const getFolderContentsService = async (folderId, userId) => {
     throw new ApiError(404, "Folder not found");
   }
 
-  const isOwner = folder.ownerId === userId;
-  const hasAccess = folder.shares.length > 0;
-
-  if (!isOwner && !hasAccess) {
-    throw new ApiError(403, "You are not allowed to access this folder");
-  }
+  await getFolderAccessService(folderId, userId);
 
   const breadcrumb = [{ label: "Home", path: "/" }];
   let currentParentId = folder.parentId;
