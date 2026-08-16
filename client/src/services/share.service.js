@@ -90,3 +90,15 @@ export const updateFolderGeneralAccess = async (folderId, linkAccess) => {
 
   return response.data;
 };
+
+export const getPublicFile = async (shareToken) => {
+  const response = await api.get(`/shares/public/files/${shareToken}`);
+
+  return response.data;
+};
+
+export const getPublicFolder = async (shareToken) => {
+  const response = await api.get(`/shares/public/folders/${shareToken}`);
+
+  return response.data;
+};

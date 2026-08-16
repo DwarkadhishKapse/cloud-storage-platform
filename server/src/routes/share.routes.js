@@ -15,9 +15,14 @@ import {
   updateFolderGeneralAccess,
   getFileAccess,
   getFolderAccess,
+  getPublicFileAccess,
+  getPublicFolderAccess,
 } from "../controllers/share.controller.js";
 
 const router = Router();
+
+router.get("/public/files/:shareToken", getPublicFileAccess);
+router.get("/public/folders/:shareToken", getPublicFolderAccess);
 
 router.get("/files/:id", protect, getFileSharing);
 router.get("/files/:id/access", protect, getFileAccess);

@@ -16,6 +16,8 @@ import {
 import {
   getFileAccessService,
   getFolderAccessService,
+  getPublicFileAccessService,
+  getPublicFolderAccessService,
 } from "../services/access.service.js";
 
 export const getFileSharing = asyncHandler(async (req, res) => {
@@ -141,5 +143,23 @@ export const getFolderAccess = asyncHandler(async (req, res) => {
   return res.status(200).json({
     success: true,
     access: result,
+  });
+});
+
+export const getPublicFileAccess = asyncHandler(async (req, res) => {
+  const result = await getPublicFileAccessService(req.params.shareToken);
+
+  return res.status(200).json({
+    success: true,
+    file: result.file,
+  });
+});
+
+export const getPublicFolderAccess = asyncHandler(async (req, res) => {
+  const result = await getPublicFolderAccessService(req.params.shareToken);
+
+  return res.status(200).json({
+    success: true,
+    folder: result.folder,
   });
 });
