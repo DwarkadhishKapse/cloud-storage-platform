@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { FiGrid, FiList, FiLogOut, FiUser } from "react-icons/fi";
+import { FiGrid, FiList, FiLogOut, FiSearch, FiUser } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
 import useViewStore from "../store/useViewStore";
 import useSearchStore from "../store/useSearchStore";
@@ -21,6 +21,19 @@ const Navbar = () => {
     user?.username?.charAt(0).toUpperCase() ||
     "U";
 
+  const handleSearch = (e) => {
+    if (e.key !== "Enter") return;
+
+    const query = searchQuery.trim();
+
+    if (!query) {
+      navigate("/");
+      return;
+    }
+
+    navigate(`/search?q=${encodeURIComponent(query)}`);
+  };
+
   const handleLogout = async () => {
     await logout();
     navigate("/login");
@@ -28,13 +41,21 @@ const Navbar = () => {
 
   return (
     <div className="flex h-20 items-center justify-between border-b border-slate-200 bg-white px-6">
-      <input
-        type="text"
-        placeholder="Search files and folders..."
-        value={searchQuery}
-        onChange={(e) => setSearchQuery(e.target.value)}
-        className="w-96 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-2 outline-none transition-all duration-200 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100"
-      />
+      <div className="relative w-96">
+        <FiSearch
+          size={18}
+          className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"
+        />
+
+        <input
+          type="text"
+          placeholder="Search files and folders..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          onKeyDown={handleSearch}
+          className="w-full rounded-2xl border border-slate-200 bg-slate-50 py-2.5 pl-11 pr-4 outline-none transition-all duration-200 focus:border-emerald-500 focus:bg-white focus:ring-2 focus:ring-emerald-100"
+        />
+      </div>
 
       <div className="flex items-center gap-4">
         <div className="flex items-center gap-2">
