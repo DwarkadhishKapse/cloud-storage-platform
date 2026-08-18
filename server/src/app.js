@@ -6,6 +6,7 @@ import authRoutes from "./routes/auth.routes.js";
 import folderRoutes from "./routes/folder.routes.js";
 import fileRoutes from "./routes/file.routes.js";
 import shareRoutes from "./routes/share.routes.js";
+import searchRoutes from "./routes/search.routes.js";
 
 const app = express();
 
@@ -23,6 +24,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/folders", folderRoutes);
 app.use("/api/files", fileRoutes);
 app.use("/api/shares", shareRoutes);
+app.use("/api/search", searchRoutes);
 
 app.use(errorHandler);
 
