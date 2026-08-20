@@ -1,21 +1,21 @@
 import React, { useState } from "react";
+
 import { Outlet, useLocation } from "react-router-dom";
 
 import Navbar from "../components/Navbar";
 import Sidebar from "../components/Sidebar";
+
 import CreateFolderModal from "../components/CreateFolderModal";
 import UploadFileModal from "../components/UploadFileModal";
 
 const DashboardLayout = () => {
   const [isCreateFolderOpen, setIsCreateFolderOpen] = useState(false);
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
-
   const [folderRefreshKey, setFolderRefreshKey] = useState(0);
 
   const location = useLocation();
 
   const folderMatch = location.pathname.match(/^\/folder\/([^/]+)$/);
-
   const currentFolderId = folderMatch ? folderMatch[1] : null;
 
   const handleFolderCreated = () => {
@@ -27,16 +27,16 @@ const DashboardLayout = () => {
   };
 
   return (
-    <div className="flex min-h-screen bg-white">
+    <div className="flex h-screen overflow-hidden bg-white">
       <Sidebar
         onNewFolder={() => setIsCreateFolderOpen(true)}
         onUploadFile={() => setIsUploadModalOpen(true)}
       />
 
-      <div className="flex flex-1 flex-col">
+      <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
         <Navbar />
 
-        <main className="flex-1 bg-white p-6">
+        <main className="min-h-0 flex-1 overflow-y-auto bg-white p-6">
           <Outlet
             context={{
               folderRefreshKey,

@@ -1,5 +1,7 @@
 import React, { useRef, useState } from "react";
+
 import useFileStore from "../store/useFileStore";
+import useStorageStore from "../store/useStorageStore";
 import { formatFileSize } from "../utils/formatFileSize";
 import { uploadFile } from "../services/file.service";
 
@@ -10,6 +12,7 @@ const UploadFileModal = ({ isOpen, onClose, parentId, onUploadSuccess }) => {
   const fileInputRef = useRef(null);
 
   const { addFile } = useFileStore();
+  const { fetchStorage } = useStorageStore();
 
   if (!isOpen) return null;
 
@@ -43,6 +46,8 @@ const UploadFileModal = ({ isOpen, onClose, parentId, onUploadSuccess }) => {
       if (!parentId) {
         addFile(response.file);
       }
+
+      await fetchStorage();
 
       if (onUploadSuccess) {
         onUploadSuccess();

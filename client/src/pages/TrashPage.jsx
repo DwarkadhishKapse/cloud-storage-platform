@@ -2,10 +2,10 @@ import React, { useEffect, useState } from "react";
 
 import useFolderStore from "../store/useFolderStore";
 import useFileStore from "../store/useFileStore";
+import useStorageStore from "../store/useStorageStore";
 
 import TrashFolderCard from "../components/TrashFolderCard";
 import TrashFileCard from "../components/TrashFileCard";
-
 import DeleteForeverFolderModal from "../components/DeleteForeverFolderModal";
 import DeleteForeverFileModal from "../components/DeleteForeverFileModal";
 import PreviewFileModal from "../components/PreviewFileModal";
@@ -21,6 +21,8 @@ import {
 import { getTrashedFolders } from "../services/folder.service";
 
 const TrashPage = () => {
+  const { fetchStorage } = useStorageStore();
+
   const { folders, setFolders, restoreFolder, permanentlyDeleteFolder } =
     useFolderStore();
 
@@ -30,12 +32,18 @@ const TrashPage = () => {
   const [folderToDelete, setFolderToDelete] = useState(null);
   const [fileToDelete, setFileToDelete] = useState(null);
   const [previewFile, setPreviewFile] = useState(null);
-
   const [loading, setLoading] = useState(true);
 
   const buildTrashTree = (folderList, fileList) => {
     const folderMap = new Map(
-      folderList.map((folder) => [folder.id, { ...folder, children: [], files: [] }]),
+      folderList.map((folder) => [
+        folder.id,
+        {
+          ...folder,
+          children: [],
+          files: [],
+        },
+      ]),
     );
 
     const rootFolders = [];
@@ -61,7 +69,10 @@ const TrashPage = () => {
       }
     });
 
-    return { rootFolders, rootFiles };
+    return {
+      rootFolders,
+      rootFiles,
+    };
   };
 
   useEffect(() => {
@@ -86,12 +97,12 @@ const TrashPage = () => {
 
   const trashFolders = folders.filter((folder) => folder.isTrashed);
   const trashFiles = files.filter((file) => file.isTrashed);
+
   const { rootFolders, rootFiles } = buildTrashTree(trashFolders, trashFiles);
 
   const handleRestoreFile = async (file) => {
     try {
       await restoreFileApi(file.id);
-
       restoreFile(file.id);
     } catch (error) {
       console.error("Failed to restore file:", error);
@@ -120,6 +131,8 @@ const TrashPage = () => {
 
       permanentlyDeleteFile(fileToDelete.id);
 
+      await fetchStorage();
+
       setFileToDelete(null);
 
       if (previewFile?.id === fileToDelete.id) {
@@ -135,6 +148,8 @@ const TrashPage = () => {
 
     try {
       await permanentlyDeleteFolder(folderToDelete.id);
+
+      await fetchStorage();
 
       setFolderToDelete(null);
     } catch (error) {
@@ -185,10 +200,14 @@ const TrashPage = () => {
                 onDeleteForever={() => handleDeleteForeverFolder(folder)}
                 onOpenFile={(file) => setPreviewFile(file)}
                 onRestoreFile={(file) =>
-                  file?.folderId ? handleRestoreFile(file) : handleRestoreFolder(file)
+                  file?.folderId
+                    ? handleRestoreFile(file)
+                    : handleRestoreFolder(file)
                 }
                 onDeleteForeverFile={(file) =>
-                  file?.folderId ? setFileToDelete(file) : setFolderToDelete(file)
+                  file?.folderId
+                    ? setFileToDelete(file)
+                    : setFolderToDelete(file)
                 }
               />
             ))}

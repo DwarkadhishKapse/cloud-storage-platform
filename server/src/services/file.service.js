@@ -2,11 +2,14 @@ import prisma from "../lib/prisma.js";
 import ApiError from "../utils/ApiError.js";
 import cloudinary from "../config/cloudinary.js";
 import { getFileAccessService } from "./access.service.js";
+import { checkStorageAvailable } from "./storage.service.js";
 
 export const uploadFileService = async (file, body, ownerId) => {
   if (!file) {
     throw new ApiError(400, "No file was uploaded");
   }
+
+  await checkStorageAvailable(ownerId, file.size);
 
   const folderId = body.folderId || null;
 
