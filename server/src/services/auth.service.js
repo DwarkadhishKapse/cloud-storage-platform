@@ -73,7 +73,7 @@ export const loginUser = async (userData) => {
     throw new ApiError(400, "Email and password are required.");
   }
 
-  const user = await prisma.user.findUnique({
+  const user = await prisma.user.findFirst({
     where: { email },
   });
 
