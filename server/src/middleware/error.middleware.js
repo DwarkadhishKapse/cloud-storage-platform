@@ -1,5 +1,10 @@
 const errorHandler = (err, req, res, next) => {
-  console.error("ERROR:", err);
+  console.error("========== SERVER ERROR ==========");
+  console.error("Message:", err.message);
+  console.error("Name:", err.name);
+  console.error("Code:", err.code);
+  console.error("Stack:", err.stack);
+  console.error("==================================");
 
   const statusCode = err.statusCode || 500;
 
