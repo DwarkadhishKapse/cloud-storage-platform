@@ -18,7 +18,7 @@ export const registerUser = async (userData) => {
     throw new ApiError(400, "All required fields are mandatory.");
   }
 
-  const existingEmail = await prisma.user.findUnique({
+  const existingEmail = await prisma.user.findFirst({
     where: { email },
   });
 
@@ -26,7 +26,7 @@ export const registerUser = async (userData) => {
     throw new ApiError(409, "Email already exists.");
   }
 
-  const existingUsername = await prisma.user.findUnique({
+  const existingUsername = await prisma.user.findFirst({
     where: { username },
   });
 
@@ -36,16 +36,26 @@ export const registerUser = async (userData) => {
 
   const hashedPassword = await bcrypt.hash(password, 10);
 
-  const user = await prisma.user.create({
-    data: {
-      username,
-      email,
-      password: hashedPassword,
-      firstName,
-      lastName,
-      phoneNumber,
-    },
-  });
+  let user;
+
+  try {
+    user = await prisma.user.create({
+      data: {
+        username,
+        email,
+        password: hashedPassword,
+        firstName,
+        lastName,
+        phoneNumber,
+      },
+    });
+  } catch (error) {
+    if (error.code === "P2002") {
+      throw new ApiError(409, "Email, username, or phone number already exists.");
+    }
+
+    throw error;
+  }
 
   const { password: _, ...safeUser } = user;
 
