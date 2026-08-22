@@ -51,7 +51,10 @@ export const registerUser = async (userData) => {
     });
   } catch (error) {
     if (error.code === "P2002") {
-      throw new ApiError(409, "Email, username, or phone number already exists.");
+      throw new ApiError(
+        409,
+        "Email, username, or phone number already exists.",
+      );
     }
 
     throw error;
@@ -59,9 +62,12 @@ export const registerUser = async (userData) => {
 
   const { password: _, ...safeUser } = user;
 
+  const token = generateToken(user.id);
+
   return {
     success: true,
     message: "User registered successfully.",
+    token,
     user: safeUser,
   };
 };

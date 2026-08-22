@@ -10,7 +10,13 @@ const protect = asyncHandler(async (req, res, next) => {
     throw new ApiError(401, "Unauthorized.");
   }
 
-  const decoded = jwt.verify(token, process.env.JWT_SECRET);
+  let decoded;
+
+  try {
+    decoded = jwt.verify(token, process.env.JWT_SECRET);
+  } catch (error) {
+    throw new ApiError(401, "Invalid or expired token.");
+  }
 
   const user = await prisma.user.findUnique({
     where: {

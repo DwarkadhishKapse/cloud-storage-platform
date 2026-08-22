@@ -33,7 +33,7 @@ const RegisterPage = () => {
 
     try {
       await register(formData);
-      navigate("/login");
+      navigate("/");
     } catch (error) {
       setError(
         error.response?.data?.message ||
@@ -78,7 +78,7 @@ const RegisterPage = () => {
               type="text"
               value={formData.firstName}
               onChange={handleChange}
-              placeholder="Dwarkadhish"
+              placeholder="First name"
               required
               className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10"
             />
@@ -98,7 +98,7 @@ const RegisterPage = () => {
               type="text"
               value={formData.lastName}
               onChange={handleChange}
-              placeholder="Kapse"
+              placeholder="Last name"
               required
               className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10"
             />
@@ -119,7 +119,7 @@ const RegisterPage = () => {
             type="text"
             value={formData.username}
             onChange={handleChange}
-            placeholder="dwarkadhish"
+            placeholder="username"
             required
             className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10"
           />
@@ -159,7 +159,7 @@ const RegisterPage = () => {
             type="tel"
             value={formData.phoneNumber}
             onChange={handleChange}
-            placeholder="9876543210"
+            placeholder="1234567890"
             required
             className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10"
           />
